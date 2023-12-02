@@ -44,6 +44,8 @@ def get_match_num(dep, num):
     Args:
         dep (string): 問題部門
         num (int): 問題番号
+    Returns:
+        int: 問題指定用番号
     """
     key = f"{dep}{num}"
     if key in QUESTION_MAP:
@@ -54,6 +56,15 @@ def get_match_num(dep, num):
     return match_num
 
 def get_submit_max(dep, num):
+    """提出回数を取得
+
+    Args:
+        dep (string): 問題部門
+        num (int): 問題番号
+
+    Returns:
+        int: 提出回数
+    """
     key = f"{dep}{num}"
     if key in QUESTION_MAP:
         submit_max = QUESTION_MAP[f"{dep}{num}"]["submit_max"]
