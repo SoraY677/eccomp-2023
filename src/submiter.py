@@ -12,24 +12,29 @@ QUESTION_MAP = {
     ### 単目的
     # https://ec-comp.jpnsec.org/ja/matches/93
     f"{SOLVE_SINGLE_ID}0": {
-        "match_num": 93
+        "match_num": 93,
+        "submit_max": 10000
     },
     # https://ec-comp.jpnsec.org/ja/matches/94
     f"{SOLVE_SINGLE_ID}1": {
         "match_num": 94,
+        "submit_max": 1000
     },
     # https://ec-comp.jpnsec.org/ja/matches/95
     f"{SOLVE_SINGLE_ID}2": {
-        "match_num": 95
+        "match_num": 95,
+        "submit_max": 1000
     },
     ### 多目的
     # https://ec-comp.jpnsec.org/ja/matches/96
     f"{SOLVE_MULTI_ID}0": {
-        "match_num": 96
+        "match_num": 96,
+        "submit_max": 10000
     },
     # https://ec-comp.jpnsec.org/ja/matches/97
     f"{SOLVE_MULTI_ID}1": {
-        "match_num": 97
+        "match_num": 97,
+        "submit_max": 1000
     }
 }
 
@@ -47,6 +52,15 @@ def get_match_num(dep, num):
         logger.error(f"問題のID`{dep}{num}`は存在しない")
         sys.exit(1)
     return match_num
+
+def get_submit_max(dep, num):
+    key = f"{dep}{num}"
+    if key in QUESTION_MAP:
+        submit_max = QUESTION_MAP[f"{dep}{num}"]["submit_max"]
+    else:
+        logger.error(f"問題のID`{dep}{num}`は存在しない")
+        sys.exit(1)
+    return submit_max
 
 def submit(dep, num, ans):
     """解提出
@@ -77,5 +91,18 @@ if __name__ == "__main__":
             logger.init()
             with self.assertRaises(SystemExit):
                 get_match_num('n', 1)
+                
+        def test_get_submit_max(self):
+            """提出回数の取得
+            """
+            submit_max = get_submit_max('s', 1)
+            self.assertTrue(submit_max == 1000)
+            
+        def test_get_submit_max_error(self):
+            """問題指定用番号のミス
+            """
+            logger.init()
+            with self.assertRaises(SystemExit):
+                get_submit_max('n', 1)
         
     unittest.main()
