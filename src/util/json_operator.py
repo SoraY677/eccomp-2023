@@ -43,7 +43,7 @@ def write(filepath, content):
 if __name__ == "__main__":
     import unittest
     import os
-    class LoggerTest(unittest.TestCase):
+    class Test(unittest.TestCase):
         
         def test_write(self):
             """書き込みテスト

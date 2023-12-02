@@ -86,7 +86,7 @@ def error(text):
 #
 if __name__ == "__main__":
     import unittest
-    class LoggerTest(unittest.TestCase):
+    class Test(unittest.TestCase):
         def test_debug(self):
             """debug表示
             """
