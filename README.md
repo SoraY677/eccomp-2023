@@ -35,18 +35,12 @@ pip install -r requirements.txt
 # -------------------------------------------------
 
 # 解提出
-python main.py {single or multi} {question-num}
-# {single or multi}: single=単目的 / multi=多目的
-# {quesition-num}: 0=練習問題(default) / 1~=本番問題
+python main.py {option}
 
 ## 使用方法
-### 単目的
-python main.py single   # 練習問題
-python main.py single 1 # 本番問題-1
-python main.py single 2 # 本番問題-2
-### 多目的
-python main.py multi    # 練習問題
-python main.py multi 1  # 本番問題-1
+python main.py         # 練習問題
+python main.py --num {1...} # 本番問題-{num}
+# -> その後CLI上で単目的/多目的の選択
 
 # -------------------------------------------------
 
