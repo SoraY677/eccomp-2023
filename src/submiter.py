@@ -49,10 +49,14 @@ if __name__ == "__main__":
     import unittest
     class Test(unittest.TestCase):
         def test_get_match_num(self):
+            """問題指定用番号の取得
+            """
             match_num = get_match_num('s', 1)
             self.assertTrue(match_num == 94)
             
         def test_get_match_num_error(self):
+            """問題指定用番号のミス
+            """
             logger.init()
             with self.assertRaises(SystemExit):
                 get_match_num('n', 1)
