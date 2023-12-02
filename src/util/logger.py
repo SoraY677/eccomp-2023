@@ -1,8 +1,10 @@
 #
 # ログ出力ラッパー関数
 #
-import sys
 import logging
+import os
+import sys
+import datetime
 
 LOG_NAME = "main"
 FORMAT = "[%(filename)s:%(lineno)d]\t%(levelname)s\t%(asctime)s\t %(message)s"
@@ -10,7 +12,7 @@ FORMAT = "[%(filename)s:%(lineno)d]\t%(levelname)s\t%(asctime)s\t %(message)s"
 _logger = None
 _log_func = {}
 
-def init(filepath=None, level=logging.DEBUG):
+def init(dirpath=None, level=logging.DEBUG):
     """初期化
 
     Args:
@@ -18,7 +20,11 @@ def init(filepath=None, level=logging.DEBUG):
         level (string, optional): ログレベル. Defaults to logging.DEBUG.
     """
     _logger = logging.getLogger("main")
-    handler = logging.StreamHandler() if filepath is None else logging.FileHandler(filepath)
+    if dirpath is None:
+        handler = logging.StreamHandler()
+    else:
+        filepath = os.path.join(dirpath, datetime.datetime.now().strftime('%Y%m%d%H%M%S') + ".log")
+        handler = logging.FileHandler(filepath)
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter(FORMAT))
     _logger.addHandler(handler)
