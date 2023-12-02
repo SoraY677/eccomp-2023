@@ -7,7 +7,6 @@ from util import logger
 SOLVE_SINGLE_ID = 's' # 単目的
 SOLVE_MULTI_ID  = 'm' # 多目的
 
-
 QUESTION_MAP = {
     ### 単目的
     # https://ec-comp.jpnsec.org/ja/matches/93
