@@ -1,3 +1,6 @@
+#
+# ファイル・ディレクトリの管理
+#
 import os.path as path
 
 PATH_MAP = {
@@ -6,9 +9,12 @@ PATH_MAP = {
 }
 
 def init(rootpath):
-    '''
-    初期化
-    '''
+    """初期化
+
+    Args:
+        rootpath (string): プロジェクトのルートパス
+    """
     for path_key in PATH_MAP:
         PATH_MAP[path_key] = path.join(rootpath, path_key)
+
 

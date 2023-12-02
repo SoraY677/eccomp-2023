@@ -1,7 +1,15 @@
+#
+# 処理の大枠定義用
+#
 from util import filepath
 from util import logger
 
 def init(rootpath):
+    """初期化
+
+    Args:
+        rootpath (string): プロジェクトのルートパス
+    """
     filepath.init(rootpath)
     logger.init(filepath.PATH_MAP["data/app-log"])
     
@@ -17,6 +25,8 @@ if __name__ == "__main__":
     import unittest
     class LoggerTest(unittest.TestCase):
         def test_init(self):
+            """初期化テスト
+            """
             rootpath = os.path.join(os.getcwd(),'..')
             init(rootpath)
     unittest.main()
