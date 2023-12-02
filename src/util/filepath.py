@@ -6,6 +6,7 @@ import os.path as path
 PATH_MAP = {
     "data": "",
     "data/app-log": "",
+    "data/result": "",
 }
 
 def init(rootpath):

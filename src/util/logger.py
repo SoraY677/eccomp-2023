@@ -164,7 +164,7 @@ if __name__ == "__main__":
             """
             import os
             text = 'ファイル出力テストだよ～'
-            filepath = '../../data/test.log'
+            filepath = '../data/app-log'
             init(filepath)
             debug(text)
             info(text)

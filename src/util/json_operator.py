@@ -2,8 +2,6 @@
 # ファイル・ディレクトリの管理
 #
 import json
-import sys
-import logger
 
 def read(filepath):
     """読み込み
@@ -12,15 +10,14 @@ def read(filepath):
         filepath (string): ファイルパス
 
     Returns:
-        map: 読み込んだJSON
+        map|None: 読み込んだJSON|読み込み失敗時None
     """
     result = None
     try:
         with open(filepath) as f:
             result = json.load(f)
     except Exception as e:
-        logger.error(e)
-        sys.exit(1)
+        return None
     return result
 
 def write(filepath, content):
@@ -29,13 +26,16 @@ def write(filepath, content):
     Args:
         filepath (string): ファイルパス
         content (map): 書き込み内容
+        
+    Returns:
+        boolean: 書き込みの成否(成:True|否:False)
     """
     try:
         with open(filepath, 'w') as f:
             json.dump(content, f, indent=2)
+        return False
     except Exception as e:
-        logger.error(e)
-        sys.exit(1)
+        return True
 
 # 
 # 単体テスト
@@ -68,9 +68,9 @@ if __name__ == "__main__":
                 ]
             }
             filepath = "../../data/test2.json"
-            write(filepath, writtenContent)
-            logger.init()
+            isFail = write(filepath, writtenContent)
             readContent = read(filepath)
             self.assertTrue(writtenContent == readContent)
+            self.assertTrue(isFail is False)
 
     unittest.main()
