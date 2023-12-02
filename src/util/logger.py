@@ -21,6 +21,7 @@ def init(dirpath=None, level=logging.DEBUG):
     """
     _logger = logging.getLogger("main")
     if dirpath is None:
+        filepath = None
         handler = logging.StreamHandler()
     else:
         filepath = os.path.join(dirpath, datetime.datetime.now().strftime('%Y%m%d%H%M%S') + ".log")
@@ -36,6 +37,8 @@ def init(dirpath=None, level=logging.DEBUG):
         logging.WARN: _logger.warning,
         logging.ERROR: _logger.error
     }
+    
+    return filepath
 
 def _common(text, level):
     """ログ出力用共通関数
@@ -164,8 +167,9 @@ if __name__ == "__main__":
             """
             import os
             text = 'ファイル出力テストだよ～'
-            filepath = '../data/app-log'
-            init(filepath)
+            dirpath = 'data/app-log'
+            filepath = init(dirpath)
+            debug(filepath)
             debug(text)
             info(text)
             warn(text)

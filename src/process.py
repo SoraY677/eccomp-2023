@@ -2,10 +2,16 @@
 # 処理の大枠定義用
 #
 import datetime
-from .util import filepath
-from .util import logger
-from . import submiter
-from . import solver
+from util import path_util
+from util import logger
+if __name__ == "__main__":
+    import submiter
+    import solver
+    import result_repository
+else:
+    from . import submiter
+    from . import solver
+    from . import result_repository
 import sys
 
 def init(rootpath):
@@ -14,7 +20,7 @@ def init(rootpath):
     Args:
         rootpath (string): プロジェクトのルートパス
     """
-    filepath.init(rootpath)
+    path_util.init(rootpath)
     logger.init()
     
     logger.info(f"[program start] {datetime.datetime.now()}")
@@ -26,14 +32,18 @@ def run(dep, num):
         dep (string): 問題部門
         num (int): 問題番号
     """
-    if dep == submiter.SOLVE_SINGLE_ID :
-        ans = solver.solve_single()
-    elif dep == submiter.SOLVE_MULTI_ID :
-        ans = solver.solve_multi()
-    else:
-        logger.error(f"部門選択に存在しないものが選ばれました: selected '{dep}' not in [{submiter.SOLVE_SINGLE_ID}| {submiter.SOLVE_MULTI_ID}]")
-    
-    submiter.submit(dep, num, ans)
+    submit_max = submiter.get_submit_max(dep, num)
+    for i in range(submit_max):
+        logger.info(f"==========第{i+1}回目==========")
+        # 解算出
+        if dep == submiter.SOLVE_SINGLE_ID :
+            ans = solver.solve_single()
+        elif dep == submiter.SOLVE_MULTI_ID :
+            ans = solver.solve_multi()
+        # 解提出
+        result = submiter.submit(dep, num, ans)
+        result_repository.save(dep, num, i+1, ans, result)
+        logger.info(f"============================")
 
 def terminate():
     """終了時

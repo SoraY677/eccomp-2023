@@ -10,14 +10,14 @@ def read(filepath):
         filepath (string): ファイルパス
 
     Returns:
-        map|None: 読み込んだJSON|読み込み失敗時None
+        map|Exception: 読み込んだJSON|読み込み失敗時Exception
     """
     result = None
     try:
         with open(filepath) as f:
             result = json.load(f)
     except Exception as e:
-        return None
+        return e
     return result
 
 def write(filepath, content):
@@ -28,14 +28,14 @@ def write(filepath, content):
         content (map): 書き込み内容
         
     Returns:
-        boolean: 書き込みの成否(成:True|否:False)
+        Exception|None: 書き込みの成否(成:None|否:Exception)
     """
     try:
         with open(filepath, 'w') as f:
             json.dump(content, f, indent=2)
-        return False
+        return None
     except Exception as e:
-        return True
+        return e
 
 # 
 # 単体テスト
@@ -54,7 +54,7 @@ if __name__ == "__main__":
                     1,2,3
                 ]
             }
-            filepath = "../../data/test.json"
+            filepath = "data/test.json"
             write(filepath, content)
             self.assertTrue(os.path.isfile(filepath))
         
@@ -67,10 +67,10 @@ if __name__ == "__main__":
                     1,2,3
                 ]
             }
-            filepath = "../../data/test2.json"
-            isFail = write(filepath, writtenContent)
+            filepath = "data/test2.json"
+            err = write(filepath, writtenContent)
             readContent = read(filepath)
             self.assertTrue(writtenContent == readContent)
-            self.assertTrue(isFail is False)
+            self.assertTrue(err is None)
 
     unittest.main()
