@@ -10,6 +10,23 @@ from util import json_operator
 from util import path_util
 from util import logger
 
+def create_result_dict(count, ans, response):
+    """結果のdictを生成
+
+    Args:
+        count (int): 解提出回数
+        ans (dict): 解提出形式のマップ
+        response (dict): 提出結果のマップ
+
+    Returns:
+        dict: 結果の辞書配列
+    """
+    return {
+        count: count,
+        ans: ans,
+        response: response
+    }
+
 def load(filepath):
     """読み込み
 
@@ -26,31 +43,24 @@ def load(filepath):
         
     return content
 
-def save(dep, num, count, ans, response):
+def save(dep, num, count, result_dict):
     """保存
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
-        count (int): 解提出回数
-        ans (dict): 解提出形式のマップ
-        response (dict): 提出結果のマップ
     """
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     if path.isdir(dirpath) is False:
         os.mkdir(dirpath)
     
     
-    file = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
-    error = json_operator.write(file, {
-        "conut": count,
-        "ans": ans,
-        "response": response
-    })
+    filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
+    error = json_operator.write(filepath, result_dict)
     if error is not None:
         logger.error(error)
         sys.exit(1)
-    return file
+    return filepath
 
 def get_result_file_path_list_order_by_count_desc(dep, num):
     """保存している結果一覧のリストを降順で取得する
@@ -100,9 +110,7 @@ if __name__ == "__main__":
         def test_load(self):
             test_start()
             c = {
-                "dep": "s",
-                "num": 1,
-                "count": 1,
+                "count": 10,
                 "ans":  {
                     "schedule": [1, 1, 2, 3, 2, 2],
                     "timeout": 600
@@ -117,7 +125,7 @@ if __name__ == "__main__":
                     }
                 }
             }
-            filepath = save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
+            filepath = save("s", 1, 1, c)
             load(filepath)
             test_end()
         def test_load_error(self):
@@ -130,9 +138,7 @@ if __name__ == "__main__":
             """
             test_start()
             c = {
-                "dep": "s",
-                "num": 1,
-                "count": 1,
+                "count": 10,
                 "ans":  {
                     "schedule": [1, 1, 2, 3, 2, 2],
                     "timeout": 600
@@ -147,7 +153,7 @@ if __name__ == "__main__":
                     }
                 }
             }
-            save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
+            save("s", 1, 1, c)
             test_end()
         def test_result_file_path_list_order_by_count_desc_empty(self):
             """ファイル一覧降順がカラの場合
@@ -161,8 +167,7 @@ if __name__ == "__main__":
             """
             test_start()
             c = {
-                "dep": "s",
-                "num": 1,
+                "count": 10,
                 "ans":  {
                     "schedule": [1, 1, 2, 3, 2, 2],
                     "timeout": 600
@@ -177,9 +182,9 @@ if __name__ == "__main__":
                     }
                 }
             }
-            save(c["dep"], c["num"], 1, c["ans"], c["result"])
-            save(c["dep"], c["num"], 2, c["ans"], c["result"])
-            list = get_result_file_path_list_order_by_count_desc(c["dep"], c["num"])
+            save("s", 1, 1, c)
+            save("s", 1, 2, c)
+            list = get_result_file_path_list_order_by_count_desc("s", 1)
             for i in range(len(list)-1):
                 self.assertTrue(list[i] > list[i+1])
             test_end()
@@ -188,9 +193,7 @@ if __name__ == "__main__":
             """
             test_start()
             c = {
-                "dep": "s",
-                "num": 1,
-                "count": 1,
+                "count": 10,
                 "ans":  {
                     "schedule": [1, 1, 2, 3, 2, 2],
                     "timeout": 600
@@ -205,8 +208,8 @@ if __name__ == "__main__":
                     }
                 }
             }
-            save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
-            result = get_latest_result(c["dep"], c["num"], 0)
+            save("s", 1, 1, c)
+            result = get_latest_result("s", 1, 0)
             self.assertTrue(result is not {})
             test_end()
         def test_get_latest_second_result(self):
@@ -214,8 +217,6 @@ if __name__ == "__main__":
             """
             test_start()
             c = {
-                "dep": "s",
-                "num": 1,
                 "count": 1,
                 "ans":  {
                     "schedule": [1, 1, 2, 3, 2, 2],
@@ -231,8 +232,8 @@ if __name__ == "__main__":
                     }
                 }
             }
-            save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
-            result = get_latest_result(c["dep"], c["num"], 1)
+            save("s", 1, 1, c)
+            result = get_latest_result("s", 1, 1)
             self.assertTrue(any(result) is False)
             test_end()
         def test_get_latest_result_empty(self):
