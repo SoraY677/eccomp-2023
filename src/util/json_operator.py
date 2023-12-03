@@ -10,7 +10,7 @@ def read(filepath):
         filepath (string): ファイルパス
 
     Returns:
-        map|Exception: 読み込んだJSON|読み込み失敗時Exception
+        dict|Exception: 読み込んだJSON|読み込み失敗時Exception
     """
     result = None
     try:
@@ -25,7 +25,7 @@ def write(filepath, content):
 
     Args:
         filepath (string): ファイルパス
-        content (map): 書き込み内容
+        content (dict): 書き込み内容
         
     Returns:
         Exception|None: 書き込みの成否(成:None|否:Exception)
