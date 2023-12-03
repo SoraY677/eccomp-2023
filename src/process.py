@@ -33,16 +33,21 @@ def run(dep, num):
         num (int): 問題番号
     """
     submit_max = submiter.get_submit_max(dep, num)
+    prev_result_dict = result_repository.get_result_file_path_list_order_by_count_desc(dep, num, 0)
+        
     for i in range(submit_max):
-        logger.info(f"==========第{i+1}回目==========")
+        count = i+1
+        logger.info(f"==========第{count}回目==========")
         # 解算出
         if dep == submiter.SOLVE_SINGLE_ID :
             ans = solver.solve_single()
         elif dep == submiter.SOLVE_MULTI_ID :
             ans = solver.solve_multi()
         # 解提出
-        result = submiter.submit(dep, num, ans)
-        result_repository.save(dep, num, i+1, ans, result)
+        response = submiter.submit(dep, num, ans)
+        result_dict = result_repository.create_result_dict(count, ans, response)
+        result_repository.save(dep, num, count, result_dict)
+        prev_result_dict = result_dict
         logger.info(f"============================")
 
 def terminate():
