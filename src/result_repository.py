@@ -26,7 +26,7 @@ def load(filepath):
         
     return content
 
-def save(dep, num, count, ans, result):
+def save(dep, num, count, ans, response):
     """保存
 
     Args:
@@ -34,7 +34,7 @@ def save(dep, num, count, ans, result):
         num (int): 問題番号
         count (int): 解提出回数
         ans (dict): 解提出形式のマップ
-        result (dict): 提出結果のマップ
+        response (dict): 提出結果のマップ
     """
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     if path.isdir(dirpath) is False:
@@ -45,7 +45,7 @@ def save(dep, num, count, ans, result):
     error = json_operator.write(file, {
         "conut": count,
         "ans": ans,
-        "result": result
+        "response": response
     })
     if error is not None:
         logger.error(error)
@@ -58,7 +58,6 @@ def get_result_file_path_list_order_by_count_desc(dep, num):
     Args:
         dep (string): 問題部門
         num (int): 問題番号
-
     Returns:
         [string]: 降順に並んだ保存している結果一覧
     """
@@ -66,6 +65,20 @@ def get_result_file_path_list_order_by_count_desc(dep, num):
     filepath_list.sort(reverse=True)
     return filepath_list
 
+def get_latest_result(dep, num, index):
+    """最新{index}件目のリザルト取得
+
+    Args:
+        dep (string): 問題部門
+        num (int): 問題番号
+        index (int): 上から何番目か
+    Returns:
+        dict: 存在すればその内容が含まれたdict|なければカラのdict
+    """
+    result_filepath_list = get_result_file_path_list_order_by_count_desc(dep, num)
+    if len(result_filepath_list) < index + 1:
+        return {}
+    return load(result_filepath_list[index])
 # 
 # 単体テスト
 #
@@ -169,5 +182,64 @@ if __name__ == "__main__":
             list = get_result_file_path_list_order_by_count_desc(c["dep"], c["num"])
             for i in range(len(list)-1):
                 self.assertTrue(list[i] > list[i+1])
+            test_end()
+        def test_get_latest_result(self):
+            """最新1件目取得成功
+            """
+            test_start()
+            c = {
+                "dep": "s",
+                "num": 1,
+                "count": 1,
+                "ans":  {
+                    "schedule": [1, 1, 2, 3, 2, 2],
+                    "timeout": 600
+                }, 
+                "result": {
+                    "objective": 1550.5,
+                    "constraint": None,
+                    "error": "エラー文",
+                    "info": {
+                        "exe_time": 503.223,
+                        "delays": [0.0, 0.0, 30.5, 14.5]
+                    }
+                }
+            }
+            save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
+            result = get_latest_result(c["dep"], c["num"], 0)
+            self.assertTrue(result is not {})
+            test_end()
+        def test_get_latest_second_result(self):
+            """最新2件目取得失敗
+            """
+            test_start()
+            c = {
+                "dep": "s",
+                "num": 1,
+                "count": 1,
+                "ans":  {
+                    "schedule": [1, 1, 2, 3, 2, 2],
+                    "timeout": 600
+                }, 
+                "result": {
+                    "objective": 1550.5,
+                    "constraint": None,
+                    "error": "エラー文",
+                    "info": {
+                        "exe_time": 503.223,
+                        "delays": [0.0, 0.0, 30.5, 14.5]
+                    }
+                }
+            }
+            save(c["dep"], c["num"], c["count"], c["ans"], c["result"])
+            result = get_latest_result(c["dep"], c["num"], 1)
+            self.assertTrue(any(result) is False)
+            test_end()
+        def test_get_latest_result_empty(self):
+            """最新1件目取得失敗（カラ）
+            """
+            test_start()
+            result = get_latest_result("s", "1", 0)
+            self.assertTrue(any(result) is False)
             test_end()
     unittest.main()
