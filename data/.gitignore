@@ -1,3 +1,2 @@
 *.log
 result/**/r*.json
-*test*
