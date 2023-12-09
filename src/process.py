@@ -6,11 +6,13 @@ from util import path_util
 from util import logger
 if __name__ == "__main__":
     import submiter
-    import solver
+    import single_solver
+    import multi_solver
     import result_repository
 else:
     from . import submiter
-    from . import solver
+    from . import single_solver
+    from . import multi_solver
     from . import result_repository
 import sys
 
@@ -40,9 +42,9 @@ def run(dep, num):
         logger.info(f"==========第{count}回目==========")
         # 解算出
         if dep == submiter.SOLVE_SINGLE_ID :
-            ans = solver.solve_single()
+            ans = single_solver.solve()
         elif dep == submiter.SOLVE_MULTI_ID :
-            ans = solver.solve_multi()
+            ans = multi_solver.solve()
         # 解提出
         response = submiter.submit(dep, num, ans)
         result_dict = result_repository.create_result_dict(count, ans, response)
