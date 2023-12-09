@@ -7,6 +7,9 @@ PATH_MAP = {
     "data": "",
     "data/app-log": "",
     "data/result": "",
+    "data/premise/{}/{}/palette.tsv": "",
+    "data/premise/{}/{}/work.tsv": "",
+    "data/premise/{}/{}/jig.tsv": ""
 }
 
 def init(rootpath):
