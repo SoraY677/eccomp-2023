@@ -13,7 +13,6 @@ INITIALIZE_INDIVIDUAL_MAX = 1000
 # 進化計算アルゴリズム関連
 INDIVISUAL_MAX = 20 # 解の個数
 
-
 # クラスタ関連
 CLUSTER_MAX_DEFAULT = 20 # クラスタリング数
 CLUSTER_LOOP_MAX_DEFAULT = 1000 # 重心算出回数の上限
