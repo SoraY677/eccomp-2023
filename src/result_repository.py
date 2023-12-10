@@ -16,15 +16,15 @@ def create_result_dict(count, ans, response):
     Args:
         count (int): 解提出回数
         ans (dict): 解提出形式のマップ
-        response (dict): 提出結果のマップ
+        objective (dict): 提出結果のマップ
 
     Returns:
         dict: 結果の辞書配列
     """
     return {
-        count: count,
-        ans: ans,
-        response: response
+        "count": count,
+        "ans": ans,
+        "objective": response
     }
 
 def load(filepath):
