@@ -146,8 +146,8 @@ def submit(dep, num, ans):
         ans (any): 解
     """
     # Todo:テストできていないので、テストコードなど修正
-    return _exec_submit_command(dep, num, ans)
-
+    # return _exec_submit_command(dep, num, ans)
+    pass
 # 
 # 単体テスト
 #
