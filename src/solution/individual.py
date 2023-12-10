@@ -32,7 +32,7 @@ class Individual:
         """
         result = []
         while(True):
-            for _ in range(work_num):
+            for _ in range(work_num * 2):
                 start = random.randint(WORK_MIN_DAY, WORK_MAX_DAY)
                 end = random.randint(start, WORK_MAX_DAY)
                 result.append(start)
