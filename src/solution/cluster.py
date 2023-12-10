@@ -4,6 +4,7 @@
 #
 import math
 import random
+import copy
 from constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
 
 CLUSTER_LIST_INDIVIDUAL_LIST_KEY = "individual_list"
@@ -25,7 +26,11 @@ class Cluster:
         self._cluster_max = cluster_max
         self._cluster_loop_max = cluster_loop_max
 
-    def generate_cluster(self, individual_list):
+    def generate(self, individual_addition_list):
+        individual_list = self._extract_current_individual_list(individual_addition_list)
+        self._generate_cluster(individual_list)
+
+    def _generate_cluster(self, individual_list):
         """クラスターを生成する
 
         Args:
@@ -116,7 +121,16 @@ class Cluster:
 
     def _calc_center_pos_from_2_pos(self, pos1, pos2):
         return (pos1 + pos2) / 2
-    
+
+    def _extract_current_individual_list(self, individual_addition_list):
+        result = []
+
+        result.extend(copy.deepcopy(individual_addition_list))          
+        for cluster in self._cluster_list:
+            result.extend(copy.deepcopy(cluster[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]))
+            
+        return result
+
     def get_separated_individual_list(self, solve_num, cluster_selected_weight = None):
         result = []
         cluster_selected_rate_tmp = cluster_selected_weight if cluster_selected_weight is not None else [1] * self._cluster_max
@@ -151,9 +165,20 @@ if __name__ == "__main__":
                 cluster_max= 20,
                 cluster_loop_max=10
             )
-            cluster.generate_cluster(individual_list)
+            cluster.generate(individual_list)
             individual_list = cluster.get_separated_individual_list(10)
             end_time = datetime.datetime.now()
             self.assertTrue(len(individual_list) == 10)
-            
+        
+        def test_recreate_individual_and_get_schedule(self):
+            individual_list1 = [Individual(10) for _ in range(100)]
+            cluster =  Cluster(
+                cluster_max= 20,
+                cluster_loop_max=10
+            )
+            cluster.generate(individual_list1)
+            individual_list2 = [Individual(10) for _ in range(100)]
+            cluster.generate(individual_list2)
+            individual_list = cluster.get_separated_individual_list(10)
+            self.assertTrue(len(individual_list) == 10)
     unittest.main()
