@@ -1,0 +1,52 @@
+
+#
+# 進化
+# 手法: GA
+# - https://ja.wikipedia.org/wiki/%E9%81%BA%E4%BC%9D%E7%9A%84%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0
+#
+import random
+from individual import Individual
+from constraints import CROSSOVER_POINT_MAX
+
+def crossover(individual1, individual2, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
+    """交叉
+
+    Args:
+        individual1 (Individual): 個体1
+        individual2 (Individual): 個体2
+        ban_generation_list (list, optional): 生成禁止リスト. Defaults to [].
+        crossover_point_max (int, optional): 交叉点最大数. Defaults to CROSSOVER_POINT_MAX.
+
+    Returns:
+        _type_: _description_
+    """
+    individual1_schedule, individual2_schedule = individual1.get_schedule(), individual2.get_schedule()
+    parent_num = random.randint(1,2)
+    parent_schedule = individual1_schedule if parent_num == 1 else individual2_schedule
+    child_schedule = individual2_schedule if parent_num == 1 else individual1_schedule
+
+    result = []
+    crossover_point = set([random.randint(0, len(parent_schedule) - 1) for _ in range(crossover_point_max)])
+    is_parent = True
+    for i in range(len(parent_schedule)):
+        if is_parent:
+            result.append(parent_schedule[i])
+        else:
+            result.append(child_schedule[i])
+        
+        if i+1 in crossover_point:
+            is_parent = not is_parent
+
+    return Individual().create(result, ban_generation_list)
+
+
+#
+# 単体テスト
+#
+if __name__ == "__main__":
+    import unittest
+    class Test(unittest.TestCase):
+        def test_crossover(self):
+            new_individual = crossover(Individual(10), Individual(10))
+            self.assertTrue(len(new_individual.get_schedule()) == 20)
+    unittest.main()

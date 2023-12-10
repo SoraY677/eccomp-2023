@@ -12,6 +12,7 @@ INITIALIZE_INDIVIDUAL_MAX_DEFAULT = 1000
 
 # 進化計算アルゴリズム関連
 INDIVISUAL_MAX = 20 # 解の個数
+CROSSOVER_POINT_MAX = 3 # 交叉の数
 
 # クラスタ関連
 CLUSTER_MAX_DEFAULT = 20 # クラスタリング数
