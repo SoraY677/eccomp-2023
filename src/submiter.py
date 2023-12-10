@@ -47,6 +47,7 @@ QUESTION_MAP = {
     }
 }
 
+WEIGHT_NUM = 4
 TIMEOUT = 3000
 
 INPUT_FORMAT_SCHEDULE_KEY = 'schedule'
@@ -106,6 +107,9 @@ def get_work_num(dep, num):
         logger.error(f"問題のID`{dep}{num}`は存在しない")
         sys.exit(1)
     return work_num
+
+def get_weight_num():
+    return WEIGHT_NUM
 
 def _decode_response(response_txt):
     """レスポンスのデコード

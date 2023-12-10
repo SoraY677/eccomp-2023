@@ -40,7 +40,7 @@ def solve(dep, num, work_num, loop_max):
         state = STATE_LOOP_TAIL
         count = 1
         cluster = IndividualCluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
-        individual_list = [Individual(work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
+        individual_list = [Individual(work_num=work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
     else: # データが存在している

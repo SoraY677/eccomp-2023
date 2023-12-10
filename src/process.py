@@ -39,6 +39,7 @@ def run(dep, num):
     """
     submit_max = submiter.get_submit_max(dep, num)
     work_num = submiter.get_work_num(dep, num)
+    weight_num = submiter.get_weight_num()
         
     if dep == submiter.SOLVE_SINGLE_ID :
         single_solver.solve(
@@ -52,6 +53,7 @@ def run(dep, num):
             dep,
             num,
             work_num,
+            weight_num,
             submit_max
         )
 

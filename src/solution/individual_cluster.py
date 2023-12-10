@@ -201,7 +201,7 @@ class IndividualCluster:
         for cluster in cluster_data[CLUSTER_LIST_KEY]:
             
             cluster_list.append({
-                CLUSTER_LIST_INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual) for individual in cluster[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]],
+                CLUSTER_LIST_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual) for individual in cluster[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]],
                 CLUSTER_LIST_CENTER_POS_X_LIST: cluster[CLUSTER_LIST_CENTER_POS_X_LIST],
                 CLUSTER_LIST_CENTER_POS_Y_LIST: cluster[CLUSTER_LIST_CENTER_POS_Y_LIST]
             })
@@ -220,8 +220,8 @@ if __name__ == "__main__":
     class Test(unittest.TestCase):
         def test_create_individual_and_get_schedule(self):
             start_time = datetime.datetime.now()
-            individual_list = [Individual(10) for _ in range(100)]
-            cluster =  Cluster(
+            individual_list = [Individual(work_num=10) for _ in range(100)]
+            cluster =  IndividualCluster(
                 cluster_max= 20,
                 cluster_loop_max=10
             )
@@ -231,13 +231,13 @@ if __name__ == "__main__":
             self.assertTrue(len(individual_list) == 10)
         
         def test_recreate_individual_and_get_schedule(self):
-            individual_list1 = [Individual(10) for _ in range(100)]
-            cluster =  Cluster(
+            individual_list1 = [Individual(work_num=10) for _ in range(100)]
+            cluster =  IndividualCluster(
                 cluster_max= 20,
                 cluster_loop_max=10
             )
             cluster.generate(individual_list1)
-            individual_list2 = [Individual(10) for _ in range(100)]
+            individual_list2 = [Individual(work_num=10) for _ in range(100)]
             cluster.generate(individual_list2)
             individual_list = cluster.get_separated_individual_list(10)
             self.assertTrue(len(individual_list) == 10)

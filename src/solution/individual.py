@@ -13,18 +13,38 @@ INDIVIDUAL_CONTENT_WEIGHTS_KEY = "weights" # Todo: 多目的部門用。後で�
 
 class Individual:
     _content = {}
-    def __init__(self, work_num = -1, ban_generation_list = []):
+    def __init__(self,
+        schedule_list = None,
+        weight_list = None,
+        ban_generation_list = [],
+        work_num = None,
+        weight_num = None
+    ):
         """初期化
 
         Args:
             work_num (int): ワーク数
             ban_generation_list (list): 作成禁止リスト（過去に作成済み）
         """
-        self._content = {}
-        self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create(work_num, ban_generation_list)
+        self._content = {
+            INDIVIDUAL_CONTENT_SCHEDULE_KEY: [],
+            INDIVIDUAL_CONTENT_WEIGHTS_KEY: []
+        }
+        
+        if schedule_list is not None:
+            self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = copy.copy(schedule_list)
+        if weight_list is not None:
+            self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = copy.copy(weight_list)
+        
+        if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] == 0):
+            if work_num is not None:
+                self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create_random_schedule_list(work_num, ban_generation_list)
+            
+        if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] == 0 and weight_num is not None):
+                self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = self._create_random_weight_list(weight_num, ban_generation_list)
     
-    def _create(self, work_num, ban_generation_list = []):
-        """生成
+    def _create_random_schedule_list(self, work_num, ban_generation_list = []):
+        """スケジュールリスト生成
 
         Args:
             work_num (int): ワーク数
@@ -33,8 +53,8 @@ class Individual:
         Returns:
             list: 開始時間・終了時間の配列
         """
-        result = []
         while(True):
+            result = []
             for _ in range(work_num):
                 start = random.randint(WORK_MIN_DAY, WORK_MAX_DAY)
                 end = random.randint(start, WORK_MAX_DAY)
@@ -45,29 +65,16 @@ class Individual:
         
         return result
     
-    def create(self, schedule_list, ban_generation_list = []):
-        """生成
+    def _create_random_weight_list(self, weight_num):
+        """ランダムに重みを決定
 
         Args:
-            schedule_list (list): スケジュールの配列
-            ban_generation_list (list, optional): 生成禁止リスト. Defaults to [].
+            weight_num (int): 重みの数
 
         Returns:
-            Individual: 個体
+            list: 重みのリスト 
         """
-        result = []
-        
-        for i in range(0, len(schedule_list), 2):
-            start_time = schedule_list[i]
-            end_time = schedule_list[i+1]
-            
-            if end_time < start_time:
-                end_time = random.randint(start_time, WORK_MAX_DAY)
-            result.append(start_time)
-            result.append(end_time)
-        
-        self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = copy.copy(result)
-        return self
+        return [random.random() for _ in range(weight_num)] 
 
     def get_schedule(self):
         """スケジュール要素を取得
@@ -77,6 +84,9 @@ class Individual:
         """
         return self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]
     
+    def get_weight_list(self):
+        return self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
+    
     def serialize(self):
         """シリアライズ
 
@@ -84,7 +94,8 @@ class Individual:
             dict: 辞書型
         """
         return {
-            INDIVIDUAL_CONTENT_SCHEDULE_KEY: self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]
+            INDIVIDUAL_CONTENT_SCHEDULE_KEY: self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY],
+            INDIVIDUAL_CONTENT_WEIGHTS_KEY: self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
         }
         
     def deserialize(self, individual_json):
@@ -96,7 +107,7 @@ class Individual:
         Returns:
             Individual: 個体
         """
-        return self.create(individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY])
+        return Individual(schedule_list=individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY], weight_list=individual_json[INDIVIDUAL_CONTENT_WEIGHTS_KEY])
     
 #
 # 単体テスト
@@ -105,10 +116,10 @@ if __name__ == "__main__":
     import unittest
     class Test(unittest.TestCase):
         def test_create_individual_and_get_schedule(self):
-            individual = Individual(10)
+            individual = Individual(work_num=10)
             self.assertTrue(len(individual.get_schedule()) == 20)
         def test_designation_create_individual(self):
             schedule_list = [7, 7, 6, 8, 3, 7, 9, 9, 6, 9, 2, 2, 1, 8, 1, 2, 1, 7, 7, 8]
-            individual = Individual().create(schedule_list)
+            individual = Individual(schedule_list=schedule_list)
             self.assertTrue(individual.get_schedule() == schedule_list)
     unittest.main()

@@ -58,8 +58,8 @@ def _deserialize(content):
         STATE_KEY: content[STATE_KEY],
         COUNT_KEY: content[COUNT_KEY],
         CLUSTER_KEY: IndividualCluster.desirialize(content[CLUSTER_KEY]),
-        INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
-        SELECTED_INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
+        INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
+        SELECTED_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
         EVALUATION_LIST: content[EVALUATION_LIST]
     }
 
