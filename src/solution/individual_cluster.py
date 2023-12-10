@@ -20,7 +20,7 @@ CLUSTER_LIST_KEY = "cluster_list"
 CLUSTER_MAX_KEY = "cluster_max"
 CLUSTER_LOOP_KEY = "cluster_key"
 
-class Cluster:
+class IndividualCluster:
     _cluster_list = []
     _cluster_max = -1
     _cluster_loop_max = -1

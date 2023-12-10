@@ -8,7 +8,7 @@ if __name__ == "__main__":
     from util import logger
     from solution import evolution
     from solution.individual import Individual
-    from solution.cluster import Cluster
+    from solution.individual_cluster import IndividualCluster
     from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 else:
     from src import submiter
@@ -16,7 +16,7 @@ else:
     from src.util import logger
     from src.solution import evolution
     from src.solution.individual import Individual
-    from src.solution.cluster import Cluster
+    from src.solution.individual_cluster import IndividualCluster
     from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 STATE_LOOP_HEAD = 0
@@ -39,7 +39,7 @@ def solve(dep, num, work_num, loop_max):
     if loaded_data is None: # データがない場合
         state = STATE_LOOP_TAIL
         count = 1
-        cluster = Cluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
+        cluster = IndividualCluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
         individual_list = [Individual(work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
@@ -81,8 +81,8 @@ def solve(dep, num, work_num, loop_max):
             state = STATE_EVALUATION
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_EVALUATION:
-            individual_list = []
             # 解改善フェーズ
+            individual_list = []
             objective_max = max([evaluation[submiter.EVAL_KEY][submiter.OUTPUT_FORMAT_OBJECTIVE_KEY] for evaluation in evaluation_list])
             for _ in range(len(evaluation_list)):
                 # 交叉
