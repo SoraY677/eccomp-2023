@@ -30,12 +30,13 @@ def solve(dep, num, work_num, loop_max):
         
         # 解生成フェーズ
         cluster_list = cluster.generate(individual_list)
-        logger.info(f"cluster:{cluster_list}")
         selected_individual_list = cluster.get_separated_individual_list(
             solve_num=INDIVISUAL_MAX
         )
         
-        logger.info(f"seletect individuals: {[individual.get_schedule() for individual in selected_individual_list]}")
+        logger.info(f"[seleteed individual List]")
+        for individual in selected_individual_list:
+            logger.info(f'{hex(id(individual))}:{individual.get_schedule() }')
         
         # 解評価フェーズ
         evaluation_list = []
@@ -44,7 +45,7 @@ def solve(dep, num, work_num, loop_max):
             # 提出用解情報の生成
             ans = submiter.create_ans(dep, individual.get_schedule())
             response = submiter.submit(dep, num, ans)
-            logger.info(f"{individual} -> response: {response}")
+            logger.info(f"{hex(id(individual))} -> response: {response}")
             # 解の保存
             result_dict = result_repository.create_result_dict(count, ans, response)
             result_repository.save(dep, num, count, result_dict)
@@ -71,9 +72,9 @@ def solve(dep, num, work_num, loop_max):
                     selected_individual_list[individual2_i]
                 )
                 individual_list.append(new_individual)
-                logger.info(f"[交叉] {new_individual}: {new_individual.get_schedule()}")
+                logger.info(f"[交叉]\t{hex(id(new_individual))} -> new: {new_individual.get_schedule()}")
             # 突然変異
             else:
                 new_individual = evolution.mutate(work_num)
                 individual_list.append(new_individual)
-                logger.info(f"[突然変異] {new_individual}: {new_individual.get_schedule()}")
+                logger.info(f"[変異]\t{hex(id(new_individual))} -> new:: {new_individual.get_schedule()}")
