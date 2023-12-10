@@ -39,7 +39,16 @@ def crossover(individual1, individual2, ban_generation_list = [], crossover_poin
 
     return Individual().create(result, ban_generation_list)
 
+def mutate(work_num):
+    """突然変異
 
+    Args:
+        work_num (int): ワーク数
+
+    Returns:
+        Individual: 個体
+    """
+    return Individual(work_num)
 #
 # 単体テスト
 #
@@ -48,5 +57,8 @@ if __name__ == "__main__":
     class Test(unittest.TestCase):
         def test_crossover(self):
             new_individual = crossover(Individual(10), Individual(10))
+            self.assertTrue(len(new_individual.get_schedule()) == 20)
+        def test_mutate(self):
+            new_individual = mutate(10)
             self.assertTrue(len(new_individual.get_schedule()) == 20)
     unittest.main()
