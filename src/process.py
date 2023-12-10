@@ -2,6 +2,8 @@
 # 処理の大枠定義用
 #
 import datetime
+import logging
+from os import path
 if __name__ == "__main__":
     import submiter
     import single_solver
@@ -15,14 +17,16 @@ else:
     from src.util import logger
 import sys
 
-def init(rootpath):
+def init(dep, num, rootpath):
     """初期化
 
     Args:
+        dep (string): 問題部門
+        num (int): 問題番号
         rootpath (string): プロジェクトのルートパス
     """
     path_util.init(rootpath)
-    logger.init()
+    logger.init(path.join(path_util.PATH_MAP["data/app-log"], dep+str(num)), logging.INFO)
     
     logger.info(f"[program start] {datetime.datetime.now()}")
     

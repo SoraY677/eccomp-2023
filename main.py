@@ -13,7 +13,7 @@ def main(dep, num):
         dep (string): 部門
         num (string): int
     """
-    process.init(os.getcwd())
+    process.init(dep, num, os.getcwd())
     process.run(dep, num)
     process.terminate()
 

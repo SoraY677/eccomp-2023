@@ -29,6 +29,7 @@ def init(dirpath=None, level=logging.DEBUG):
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter(FORMAT))
     _logger.addHandler(handler)
+    _logger.setLevel(level)
     
     global _log_func
     _log_func = {
@@ -59,6 +60,7 @@ def debug(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.DEBUG)
+    print('[DEBUG]', text)
 
 def info(text):
     """info出力
@@ -67,6 +69,7 @@ def info(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.INFO)
+    print('[INFO]', text)
 
 def warn(text):
     """warn出力
@@ -75,6 +78,7 @@ def warn(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.WARN)
+    print('[WARN]', text)
 
 def error(text):
     """error出力
@@ -83,6 +87,7 @@ def error(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.ERROR)
+    print('[ERROR]', text)
 
 # 
 # 単体テスト
