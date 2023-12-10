@@ -12,15 +12,28 @@ CLUSTER_LIST_CENTER_POS_X_LIST = "center_pos_x_list"
 CLUSTER_LIST_CENTER_POS_Y_LIST = "center_pos_y_list"
 
 class Cluster:
-    _list = []
     _cluster_max = -1
     _cluster_loop_max = -1
     def __init__(self, cluster_max = CLUSTER_MAX_DEFAULT, cluster_loop_max = CLUSTER_LOOP_MAX_DEFAULT):
+        """初期化
+
+        Args:
+            cluster_max (int, optional): クラスタの数. Defaults to CLUSTER_MAX_DEFAULT.
+            cluster_loop_max (int, optional): クラスタのループ数. Defaults to CLUSTER_LOOP_MAX_DEFAULT.
+        """
         self._cluster_max = cluster_max
         self._cluster_loop_max = cluster_loop_max
 
-
     def generate_cluster(self, individual_list):
+        """クラスターを生成する
+
+        Args:
+            individual_list (list): 個体群のリスト
+
+        Returns:
+            list: クラスタリスト
+        """
+        individual_tuple = tuple(individual_list)
         # クラスタ分け番号をランダムに振る
         cluster_list = []
         cluster_num_list = [i % self._cluster_max for i in range(len(individual_list))]
@@ -34,8 +47,8 @@ class Cluster:
                 CLUSTER_LIST_CENTER_POS_Y_LIST: []
             })
             
-        for i in range(len(individual_list)):
-            cluster_list[i % self._cluster_max][CLUSTER_LIST_INDIVIDUAL_LIST_KEY].append(individual_list[i])
+        for individual in individual_tuple:
+            cluster_list[i % self._cluster_max][CLUSTER_LIST_INDIVIDUAL_LIST_KEY].append(individual)
 
         # 再重心計算・クラスタリング
         is_some_cluster_center_change = True
@@ -113,13 +126,15 @@ class Cluster:
 if __name__ == "__main__":
     import unittest
     from individual import Individual
-    from constraints import INITIALIZE_INDIVIDUAL_MAX
+    import datetime
     class Test(unittest.TestCase):
         def test_create_individual_and_get_schedule(self):
-            length = 10
-            individual_list = [Individual(10) for _ in range(length)]
+            length = 1000
+            start_time = datetime.datetime.now()
+            individual_list = [Individual(10) for _ in range(1000)]
             cluster_list = Cluster(
-                cluster_loop_max=10
+                cluster_loop_max=100
             ).generate_cluster(individual_list)
+            end_time = datetime.datetime.now()
             self.assertTrue(len(cluster_list) == length)
     unittest.main()
