@@ -20,13 +20,20 @@ else:
     from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 STATE_LOOP_HEAD = 0
-STATE_AFTER_GENERATE_ANS = 1
-STATE_INDIVIDUAL_SELECT = 2
-STATE_EVALUATION = 3
-STATE_EVOLVE = 4
-STATE_LOOP_TAIL = 5
+STATE_INDIVIDUAL_SELECT = 1
+STATE_EVALUATION = 2
+STATE_EVOLVE = 3
+STATE_LOOP_TAIL = 4
 
 def solve(dep, num, work_num, loop_max):
+    """解実行
+
+    Args:
+        dep (string): 問題部門
+        num (int): 問題番号
+        work_num (int): ワーク数
+        loop_max (int): ループ数
+    """
     loaded_data = store.load(dep, num)
     
     if loaded_data is None: # データがない場合
@@ -55,11 +62,7 @@ def solve(dep, num, work_num, loop_max):
             cluster.generate(individual_list)
             selected_individual_list = cluster.get_separated_individual_list(
                 solve_num=INDIVISUAL_MAX
-            )   
-            state = STATE_AFTER_GENERATE_ANS
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
-        if state == STATE_AFTER_GENERATE_ANS:
-            # 解選択フェーズ
+            )
             logger.info(f"[seleted individual List]")
             for individual in selected_individual_list:
                 logger.info(f'{hex(id(individual))}:{individual.get_schedule() }')
