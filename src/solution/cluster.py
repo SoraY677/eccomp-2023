@@ -96,7 +96,6 @@ class Cluster:
             if is_some_cluster_center_change is False:
                 break
         self._cluster_list = cluster_list
-        return cluster_list
 
     def _calc_individual_pos(self, individual):
         """個体の座標を計算
@@ -117,6 +116,26 @@ class Cluster:
 
     def _calc_center_pos_from_2_pos(self, pos1, pos2):
         return (pos1 + pos2) / 2
+    
+    def get_separated_individual_list(self, solve_num, cluster_selected_weight = None):
+        result = []
+        cluster_selected_rate_tmp = cluster_selected_weight if cluster_selected_weight is not None else [1] * self._cluster_max
+
+        for _ in range(solve_num):
+            selected_cluster_num = random.choices([i for i in range(self._cluster_max)], k = 1, weights = cluster_selected_rate_tmp)[0]
+            individual_list = self._cluster_list[selected_cluster_num][CLUSTER_LIST_INDIVIDUAL_LIST_KEY]
+            individual_list_index = individual_list.index(random.choice(individual_list))
+            target_individual = individual_list.pop(individual_list_index)
+            result.append(target_individual)
+            
+            if len(individual_list) == 0:
+                cluster_selected_rate_tmp[selected_cluster_num] = 0
+                
+                cluster_selected_rate_set = set(cluster_selected_rate_tmp)
+                if len(cluster_selected_rate_set) == 1 and cluster_selected_rate_set[0] == 0:
+                    break
+                
+        return result
 #
 # 単体テスト
 #
@@ -132,8 +151,9 @@ if __name__ == "__main__":
                 cluster_max= 20,
                 cluster_loop_max=10
             )
-            cluster_list = cluster.generate_cluster(individual_list)
+            cluster.generate_cluster(individual_list)
+            individual_list = cluster.get_separated_individual_list(10)
             end_time = datetime.datetime.now()
+            self.assertTrue(len(individual_list) == 10)
             
-            self.assertTrue(len(cluster_list) == 20)
     unittest.main()
