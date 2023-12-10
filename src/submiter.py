@@ -44,6 +44,8 @@ QUESTION_MAP = {
     }
 }
 
+TIMEOUT = 3000
+
 def _get_match_num(dep, num):
     """問題指定用番号を取得
 
@@ -124,6 +126,16 @@ def _exec_submit_command(dep, num, ans):
         response = {}
 
     return response
+
+def create_ans(dep, schedule, weights=None, timeout=TIMEOUT):
+    ans = {
+        "schedule": schedule,
+        "timeout": timeout
+    }
+    if dep == SOLVE_MULTI_ID:
+        ans[weights] = weights
+    
+    return ans
 
 def submit(dep, num, ans):
     """解提出
