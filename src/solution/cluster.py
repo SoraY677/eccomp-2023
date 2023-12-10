@@ -30,8 +30,16 @@ class Cluster:
         self._cluster_loop_max = cluster_loop_max
 
     def generate(self, individual_addition_list):
+        """クラスター生成
+
+        Args:
+            individual_addition_list (list): 追加の個体群
+
+        Returns:
+            list: クラスターリスト
+        """
         individual_list = self._extract_current_individual_list(individual_addition_list)
-        self._generate_cluster(individual_list)
+        return self._generate_cluster(individual_list)
 
     def _generate_cluster(self, individual_list):
         """クラスターを生成する
