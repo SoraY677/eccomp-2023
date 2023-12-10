@@ -11,7 +11,7 @@ class Individual:
     _content = {
         INDIVIDUAL_CONTENT_SCHEDULE_KEY: []
     }
-    def __init__(self, work_num, ban_generation_list):
+    def __init__(self, work_num, ban_generation_list = []):
         """初期化
 
         Args:
