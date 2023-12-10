@@ -19,9 +19,12 @@ else:
     from src.solution.cluster import Cluster
     from src.solution.individual import Individual
 
+STATE_KEY = 'state'
 COUNT_KEY = "count"
 CLUSTER_KEY = "cluster"
-SELECTED_INDIVIDUAL_LIST = "selected_individual_list"
+SELECTED_INDIVIDUAL_LIST_KEY = "selected_individual_list"
+INDIVIDUAL_LIST_KEY = "individual_list"
+EVALUATION_LIST = "evaluation_list"
 
 def load(dep, num):
     """読み込み
@@ -35,6 +38,7 @@ def load(dep, num):
     """
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     file_list = sorted(glob.glob(dirpath + '\*'), reverse=True)
+    print(file_list)
     if len(file_list) == 0:
         return None
     content = json_operator.read(file_list[0])
@@ -43,42 +47,71 @@ def load(dep, num):
     return _deserialize(content)
 
 def _deserialize(content):
+    """デシリアライズ
+
+    Args:
+        content (dict): デシリアライズ対象
+
+    Returns:
+        dict: デシリアライズ後のデータ
+    """
     return {
+        STATE_KEY: content[STATE_KEY],
         COUNT_KEY: content[COUNT_KEY],
         CLUSTER_KEY: Cluster.desirialize(content[CLUSTER_KEY]),
-        SELECTED_INDIVIDUAL_LIST: [Individual().deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST]]
+        INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
+        SELECTED_INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
+        EVALUATION_LIST: content[EVALUATION_LIST]
     }
 
-def save(dep, num, count, cluster, selected_individual_list):
+def save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list):
     """保存
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
+        state(int): 状態変数
         count (int): 現在の回数
         cluster (Cluster): クラスター
+        individual_list (list): 生成した個体群
         selected_individual_list (list): 選択された個体群
-
+        evaluation_list(list): 評価リスト
     Returns:
         str: ファイルパス
     """
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     if path.isdir(dirpath) is False:
         os.mkdir(dirpath)
-    filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
+    filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{state}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
     
-    data = _serialize(count, cluster, selected_individual_list)
+    data = _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list)
     error = json_operator.write(filepath, data)
     if error is not None:
         logger.error(error)
         sys.exit(1)
     return filepath
 
-def _serialize(count, cluster, selected_individual_list):
+def _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list):
+    """シリアライズ
+
+    Args:
+        state(int): 状態変数
+        count (int): 現在の回数
+        cluster (Cluster): クラスター
+        individual_list (list): 生成した個体群
+        selected_individual_list (list): 選択された個体群
+        evaluation_list(list): 評価リスト
+
+    Returns:
+        dict: シリアライズ後のデータ
+    """
     return {
+        STATE_KEY: state,
         COUNT_KEY: count,
         CLUSTER_KEY: cluster.serialize(),
-        SELECTED_INDIVIDUAL_LIST: [individual.serialize() for individual in selected_individual_list]
+        INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in individual_list],
+        SELECTED_INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in selected_individual_list],
+        EVALUATION_LIST: evaluation_list
     }
 
 def get_result_file_path_list_order_by_count_desc(dep, num):

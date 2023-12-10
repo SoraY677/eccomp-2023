@@ -49,6 +49,20 @@ QUESTION_MAP = {
 
 TIMEOUT = 3000
 
+INPUT_FORMAT_SCHEDULE_KEY = 'schedule'
+INPUT_FORMAT_WEIGHT_KEY = 'weights'
+INPUT_FORMAT_TIMEOUT_KEY = 'timeout'
+
+ANS_KEY = 'ans'
+EVAL_KEY = 'eval'
+
+OUTPUT_FORMAT_OBJECTIVE_KEY = 'objective'
+OUTPUT_FORMAT_CONSTRAINT_KEY = 'constraint'
+OUTPUT_FORMAT_ERROR_KEY = 'error'
+OUTPUT_FORMAT_INFO_KEY = 'info'
+OUTPUT_FORMAT_INFO_EXETIME_KEY = 'exe_time'
+OUTPUT_FORMAT_INFO_DELAYS_KEY = 'delays'
+
 def _get_match_num(dep, num):
     """問題指定用番号を取得
 
@@ -106,13 +120,13 @@ def _decode_response(response_txt):
     logger.info(f'レスポンス: {decoded_response}')
     return decoded_response
 
-def _exec_submit_command(dep, num, ans):
+def _exec_submit_command(dep, num, ans_list):
     """実行コマンド
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
-        ans (dict): 解答
+        ans_list (list): 解答リスト
 
     Returns:
         dict: 成功:レスポンス|失敗:カラ辞書型配列
@@ -131,35 +145,54 @@ def _exec_submit_command(dep, num, ans):
     # return response
     
     # mock
-    return {
-        "objective": 1550.5,
-        "constraint": None,
-        "error": "エラー文",
-        "info": {
-            "exe_time": 503.223,
-            "delays": [0.0, 0.0, 30.5, 14.5,...]
-	}
-}
+    result = []
+    for ans in ans_list:
+        result.append({
+            ANS_KEY: ans,
+            EVAL_KEY: {
+                OUTPUT_FORMAT_OBJECTIVE_KEY: 1550.5,
+                OUTPUT_FORMAT_CONSTRAINT_KEY: None,
+                OUTPUT_FORMAT_ERROR_KEY: "エラー文",
+                OUTPUT_FORMAT_INFO_KEY: {
+                    OUTPUT_FORMAT_INFO_EXETIME_KEY: 503.223,
+                    OUTPUT_FORMAT_INFO_DELAYS_KEY: [0.0, 0.0, 30.5, 14.5]
+                }
+            }
+        })
+    return result
 
-def create_ans(dep, schedule, weights=None, timeout=TIMEOUT):
-    ans = {
-        "schedule": schedule,
-        "timeout": timeout
-    }
-    if dep == SOLVE_MULTI_ID:
-        ans[weights] = weights
+def create_ans_list(dep, input_solution, timeout=TIMEOUT):
+    """解のリストを生成
+
+    Args:
+        dep (str): 問題の対象
+        input_solution (list): 解の対象要素リスト
+        timeout (int, optional): タイムアウト. Defaults to TIMEOUT.
+
+    Returns:
+        list: 解答用のリスト
+    """
+    ans_list = []
+    for solution in input_solution:
+        ans = {
+            INPUT_FORMAT_SCHEDULE_KEY: solution[INPUT_FORMAT_SCHEDULE_KEY],
+            INPUT_FORMAT_TIMEOUT_KEY: timeout
+        }
+        if dep == SOLVE_MULTI_ID:
+            ans[INPUT_FORMAT_WEIGHT_KEY] = solution[INPUT_FORMAT_WEIGHT_KEY]
+        ans_list.append(ans)
     
-    return ans
+    return ans_list
 
-def submit(dep, num, ans):
+def submit(dep, num, ans_list):
     """解提出
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
-        ans (any): 解
+        ans_list (any): 解のリスト
     """
-    return _exec_submit_command(dep, num, ans)
+    return _exec_submit_command(dep, num, ans_list)
 # 
 # 単体テスト
 #

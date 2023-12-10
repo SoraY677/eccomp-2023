@@ -12,7 +12,7 @@ else:
     from src.solution.individual import Individual
     from src.solution.constraints import CROSSOVER_POINT_MAX
 
-def crossover(individual1, individual2, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
+def crossover(schedule1, schedule2, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
     """交叉
 
     Args:
@@ -24,10 +24,9 @@ def crossover(individual1, individual2, ban_generation_list = [], crossover_poin
     Returns:
         _type_: _description_
     """
-    individual1_schedule, individual2_schedule = individual1.get_schedule(), individual2.get_schedule()
     parent_num = random.randint(1,2)
-    parent_schedule = individual1_schedule if parent_num == 1 else individual2_schedule
-    child_schedule = individual2_schedule if parent_num == 1 else individual1_schedule
+    parent_schedule = schedule1 if parent_num == 1 else schedule2
+    child_schedule = schedule2 if parent_num == 1 else schedule1
 
     result = []
     crossover_point = set([random.randint(0, len(parent_schedule) - 1) for _ in range(crossover_point_max)])
