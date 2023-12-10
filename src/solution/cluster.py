@@ -1,5 +1,5 @@
 #
-# 解の多次元クラスタ
+# 個体用の多次元クラスタ
 # k平均法を使用：https://qiita.com/g-k/items/0d5d22a12a4507ecbf11
 #
 import math
@@ -20,7 +20,7 @@ CLUSTER_LIST_KEY = "cluster_list"
 CLUSTER_MAX_KEY = "cluster_max"
 CLUSTER_LOOP_KEY = "cluster_max_key"
 
-class IndividualCluster:
+class Cluster:
     _cluster_list = []
     _cluster_max = -1
     _cluster_loop_max = -1
@@ -68,7 +68,6 @@ class IndividualCluster:
         for ind_i, individual in enumerate(individual_tuple):
             cls_i = cluster_num_list[ind_i]
             cluster_list[cls_i][CLUSTER_LIST_INDIVIDUAL_LIST_KEY].append(individual)
-        
 
         # 再重心計算・クラスタリング
         is_some_cluster_center_change = True
@@ -188,7 +187,7 @@ class IndividualCluster:
             CLUSTER_LOOP_KEY: self._cluster_loop_max
         }
         
-    def desirialize(cluster_data):
+    def deserialize(cluster_data):
         """デシリアライズ
 
         Args:
@@ -221,7 +220,7 @@ if __name__ == "__main__":
         def test_create_individual_and_get_schedule(self):
             start_time = datetime.datetime.now()
             individual_list = [Individual(work_num=10) for _ in range(100)]
-            cluster =  IndividualCluster(
+            cluster =  Cluster(
                 cluster_max= 20,
                 cluster_loop_max=10
             )
@@ -232,7 +231,7 @@ if __name__ == "__main__":
         
         def test_recreate_individual_and_get_schedule(self):
             individual_list1 = [Individual(work_num=10) for _ in range(100)]
-            cluster =  IndividualCluster(
+            cluster =  Cluster(
                 cluster_max= 20,
                 cluster_loop_max=10
             )

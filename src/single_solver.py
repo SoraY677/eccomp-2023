@@ -8,7 +8,7 @@ if __name__ == "__main__":
     from util import logger
     from solution import evolution
     from solution.individual import Individual
-    from solution.individual_cluster import IndividualCluster
+    from solution.cluster import Cluster
     from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 else:
     from src import submiter
@@ -16,7 +16,7 @@ else:
     from src.util import logger
     from src.solution import evolution
     from src.solution.individual import Individual
-    from src.solution.individual_cluster import IndividualCluster
+    from src.solution.cluster import Cluster
     from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 STATE_LOOP_HEAD = 0
@@ -39,14 +39,14 @@ def solve(dep, num, work_num, loop_max):
     if loaded_data is None: # データがない場合
         state = STATE_LOOP_TAIL
         count = 1
-        cluster = IndividualCluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
+        cluster = Cluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
         individual_list = [Individual(work_num=work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
     else: # データが存在している
         state = loaded_data[store.STATE_KEY]
         count = loaded_data[store.COUNT_KEY]
-        cluster = loaded_data[store.INDIVIDUAL_CLUSTER_KEY]
+        cluster = loaded_data[store.CLUSTER_KEY]
         individual_list = loaded_data[store.INDIVIDUAL_LIST_KEY]
         selected_individual_list = loaded_data[store.SELECTED_INDIVIDUAL_LIST_KEY]
         evaluation_list = loaded_data[store.EVALUATION_LIST]

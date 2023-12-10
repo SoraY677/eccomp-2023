@@ -10,18 +10,19 @@ if __name__ == "__main__":
     from util import json_operator
     from util import path_util
     from util import logger
-    from solution.individual_cluster import IndividualCluster
+    from solution.cluster import Cluster
     from solution.individual import Individual
 else:
     from src.util import json_operator
     from src.util import path_util
     from src.util import logger
-    from src.solution.individual_cluster import IndividualCluster
+    from src.solution.cluster import Cluster
     from src.solution.individual import Individual
 
 STATE_KEY = 'state'
 COUNT_KEY = "count"
-INDIVIDUAL_CLUSTER_KEY = "individual_cluster"
+CLUSTER_KEY = "cluster"
+WEIGHT_CLUSTER_KEY = "weight_cluster"
 SELECTED_INDIVIDUAL_LIST_KEY = "selected_individual_list"
 INDIVIDUAL_LIST_KEY = "individual_list"
 EVALUATION_LIST = "evaluation_list"
@@ -57,13 +58,14 @@ def _deserialize(content):
     return {
         STATE_KEY: content[STATE_KEY],
         COUNT_KEY: content[COUNT_KEY],
-        INDIVIDUAL_CLUSTER_KEY: IndividualCluster.desirialize(content[INDIVIDUAL_CLUSTER_KEY]),
+        CLUSTER_KEY: Cluster.deserialize(content[CLUSTER_KEY]),
+        WEIGHT_CLUSTER_KEY: 
         INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
         SELECTED_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
         EVALUATION_LIST: content[EVALUATION_LIST]
     }
 
-def save(dep, num, state, count, individual_cluster, individual_list, selected_individual_list, evaluation_list):
+def save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list):
     """保存
 
     Args:
@@ -71,7 +73,7 @@ def save(dep, num, state, count, individual_cluster, individual_list, selected_i
         num (int): 問題番号
         state(int): 状態変数
         count (int): 現在の回数
-        individual_cluster (IndividualCluster): 個体群のクラスター
+        cluster (Cluster): 個体群のクラスター
         individual_list (list): 生成した個体群
         selected_individual_list (list): 選択された個体群
         evaluation_list(list): 評価リスト
@@ -83,20 +85,20 @@ def save(dep, num, state, count, individual_cluster, individual_list, selected_i
         os.mkdir(dirpath)
     filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{state}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
     
-    data = _serialize(state, count, individual_cluster, individual_list, selected_individual_list, evaluation_list)
+    data = _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list)
     error = json_operator.write(filepath, data)
     if error is not None:
         logger.error(error)
         sys.exit(1)
     return filepath
 
-def _serialize(state, count, individual_cluster, individual_list, selected_individual_list, evaluation_list):
+def _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list):
     """シリアライズ
 
     Args:
         state(int): 状態変数
         count (int): 現在の回数
-        individual_cluster (IndividualCluster): 個体群のクラスター
+        cluster (Cluster): 個体群のクラスター
         individual_list (list): 生成した個体群
         selected_individual_list (list): 選択された個体群
         evaluation_list(list): 評価リスト
@@ -107,7 +109,7 @@ def _serialize(state, count, individual_cluster, individual_list, selected_indiv
     return {
         STATE_KEY: state,
         COUNT_KEY: count,
-        INDIVIDUAL_CLUSTER_KEY: individual_cluster.serialize(),
+        CLUSTER_KEY: cluster.serialize(),
         INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in individual_list],
         SELECTED_INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in selected_individual_list],
         EVALUATION_LIST: evaluation_list
