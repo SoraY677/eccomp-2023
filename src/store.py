@@ -10,62 +10,76 @@ if __name__ == "__main__":
     from util import json_operator
     from util import path_util
     from util import logger
+    from solution.cluster import Cluster
+    from solution.individual import Individual
 else:
     from src.util import json_operator
     from src.util import path_util
     from src.util import logger
+    from src.solution.cluster import Cluster
+    from src.solution.individual import Individual
 
-def create_result_dict(count, ans, response):
-    """結果のdictを生成
+COUNT_KEY = "count"
+CLUSTER_KEY = "cluster"
+SELECTED_INDIVIDUAL_LIST = "selected_individual_list"
 
-    Args:
-        count (int): 解提出回数
-        ans (dict): 解提出形式のマップ
-        objective (dict): 提出結果のマップ
-
-    Returns:
-        dict: 結果の辞書配列
-    """
-    return {
-        "count": count,
-        "ans": ans,
-        "objective": response["objective"]
-    }
-
-def load(filepath):
+def load(dep, num):
     """読み込み
 
     Args:
-        filepath (string): ファイルパス
+        dep (string): 問題部門
+        num (int): 問題番号
 
     Returns:
-        dict: ファイル内容
+        dict|None: ファイル内容|なければNone
     """
-    content = json_operator.read(filepath)
-    if type(content) is not dict:
-        logger.error(content)
-        sys.exit(1)
-        
-    return content
+    dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
+    file_list = sorted(glob.glob(dirpath + '\*'), reverse=True)
+    if len(file_list) == 0:
+        return None
+    content = json_operator.read(file_list[0])
+    if len(file_list) < 0 or type(content) is not dict:
+        return None
+    return _deserialize(content)
 
-def save(dep, num, count, result_dict):
+def _deserialize(content):
+    return {
+        COUNT_KEY: content[COUNT_KEY],
+        CLUSTER_KEY: Cluster.desirialize(content[CLUSTER_KEY]),
+        SELECTED_INDIVIDUAL_LIST: [Individual().deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST]]
+    }
+
+def save(dep, num, count, cluster, selected_individual_list):
     """保存
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
+        count (int): 現在の回数
+        cluster (Cluster): クラスター
+        selected_individual_list (list): 選択された個体群
+
+    Returns:
+        str: ファイルパス
     """
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     if path.isdir(dirpath) is False:
         os.mkdir(dirpath)
-    
-    
     filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
-    error = json_operator.write(filepath, result_dict)
+    
+    data = _serialize(count, cluster, selected_individual_list)
+    error = json_operator.write(filepath, data)
     if error is not None:
         logger.error(error)
         sys.exit(1)
     return filepath
+
+def _serialize(count, cluster, selected_individual_list):
+    return {
+        COUNT_KEY: count,
+        CLUSTER_KEY: cluster.serialize(),
+        SELECTED_INDIVIDUAL_LIST: [individual.serialize() for individual in selected_individual_list]
+    }
 
 def get_result_file_path_list_order_by_count_desc(dep, num):
     """保存している結果一覧のリストを降順で取得する

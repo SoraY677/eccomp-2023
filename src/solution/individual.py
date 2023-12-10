@@ -77,6 +77,27 @@ class Individual:
         """
         return self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]
     
+    def serialize(self):
+        """シリアライズ
+
+        Returns:
+            dict: 辞書型
+        """
+        return {
+            INDIVIDUAL_CONTENT_SCHEDULE_KEY: self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]
+        }
+        
+    def deserialize(self, individual_json):
+        """デシリアライズ
+
+        Args:
+            individual_json (dict): JSON
+
+        Returns:
+            Individual: 個体
+        """
+        return self.create(individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY])
+    
 #
 # 単体テスト
 #

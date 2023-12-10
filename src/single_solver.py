@@ -4,37 +4,48 @@
 import random
 if __name__ == "__main__":
     import submiter
-    import result_repository
+    import store
     from util import logger
     from solution import evolution
-    from solution.population import Population
+    from solution.individual import Individual
     from solution.cluster import Cluster
-    from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE
+    from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 else:
     from src import submiter
-    from src import result_repository
+    from src import store
     from src.util import logger
     from src.solution import evolution
-    from src.solution.population import Population
+    from src.solution.individual import Individual
     from src.solution.cluster import Cluster
-    from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE
+    from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 def solve(dep, num, work_num, loop_max):
-    population = Population(work_num)
-    cluster = Cluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
-    individual_list = population.get_individual_list()
+    loaded_data = store.load(dep, num)
     
-    for i in range(loop_max):
-        count = i+1
+    if loaded_data is None: # データがない場合
+        count = 1
+        cluster = Cluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
+        individual_list = [Individual(work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
+    else: # データが存在している
+        count = loaded_data[store.COUNT_KEY]
+        cluster = loaded_data[store.CLUSTER_KEY]
+        individual_list = loaded_data[store.SELECTED_INDIVIDUAL_LIST]
+        
+    print(count)
+    
+    while(count <= loop_max):
         logger.info(f"==========第{count}回目==========")
         
+        # import sys
+        # sys.exit(1)
+        
         # 解生成フェーズ
-        cluster_list = cluster.generate(individual_list)
+        cluster.generate(individual_list)
         selected_individual_list = cluster.get_separated_individual_list(
             solve_num=INDIVISUAL_MAX
         )
-        
-        logger.info(f"[seleteed individual List]")
+        store.save(dep, num, count, cluster, selected_individual_list)
+        logger.info(f"[seleted individual List]")
         for individual in selected_individual_list:
             logger.info(f'{hex(id(individual))}:{individual.get_schedule() }')
         
@@ -42,14 +53,13 @@ def solve(dep, num, work_num, loop_max):
         evaluation_list = []
         objective_list = []
         for individual in selected_individual_list:
-            # 提出用解情報の生成
             ans = submiter.create_ans(dep, individual.get_schedule())
             response = submiter.submit(dep, num, ans)
             logger.info(f"{hex(id(individual))} -> response: {response}")
             # 解の保存
-            result_dict = result_repository.create_result_dict(count, ans, response)
-            result_repository.save(dep, num, count, result_dict)
-            objective = result_dict["objective"]
+            
+            
+            objective = response["objective"]
             evaluation_list.append({
                 "individual": individual,
                 "objective": objective
@@ -78,3 +88,5 @@ def solve(dep, num, work_num, loop_max):
                 new_individual = evolution.mutate(work_num)
                 individual_list.append(new_individual)
                 logger.info(f"[変異]{hex(id(new_individual))} -> new:: {new_individual.get_schedule()}")
+                
+        count += 1

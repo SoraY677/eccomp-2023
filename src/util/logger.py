@@ -4,7 +4,6 @@
 import logging
 import os
 import sys
-import datetime
 
 LOG_NAME = "main"
 FORMAT = "[%(filename)s:%(lineno)d]\t%(levelname)s\t%(asctime)s\t %(message)s"
@@ -24,7 +23,7 @@ def init(dirpath=None, level=logging.DEBUG):
         filepath = None
         handler = logging.StreamHandler()
     else:
-        filepath = os.path.join(dirpath, datetime.datetime.now().strftime('%Y%m%d%H%M%S') + ".log")
+        filepath = os.path.join(dirpath, "main.log")
         handler = logging.FileHandler(filepath)
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter(FORMAT))
@@ -60,7 +59,6 @@ def debug(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.DEBUG)
-    print('[DEBUG]', text)
 
 def info(text):
     """info出力
@@ -69,7 +67,6 @@ def info(text):
         text (string): ログ出力テキスト
     """
     _common(text, logging.INFO)
-    print('[INFO]', text)
 
 def warn(text):
     """warn出力

@@ -7,25 +7,31 @@ import random
 import copy
 if __name__ == "__main__":
     from constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
+    from individual import Individual
 else:
     from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
+    from src.solution.individual import Individual
 
 CLUSTER_LIST_INDIVIDUAL_LIST_KEY = "individual_list"
 CLUSTER_LIST_CLUSTER_NUM = "cluster_num"
 CLUSTER_LIST_CENTER_POS_X_LIST = "center_pos_x_list"
 CLUSTER_LIST_CENTER_POS_Y_LIST = "center_pos_y_list"
+CLUSTER_LIST_KEY = "cluster_list"
+CLUSTER_MAX_KEY = "cluster_max"
+CLUSTER_LOOP_KEY = "cluster_key"
 
 class Cluster:
     _cluster_list = []
     _cluster_max = -1
     _cluster_loop_max = -1
-    def __init__(self, cluster_max = CLUSTER_MAX_DEFAULT, cluster_loop_max = CLUSTER_LOOP_MAX_DEFAULT):
+    def __init__(self, cluster_max = CLUSTER_MAX_DEFAULT, cluster_loop_max = CLUSTER_LOOP_MAX_DEFAULT, cluster_list = []):
         """初期化
 
         Args:
             cluster_max (int, optional): クラスタの数. Defaults to CLUSTER_MAX_DEFAULT.
             cluster_loop_max (int, optional): クラスタのループ数. Defaults to CLUSTER_LOOP_MAX_DEFAULT.
         """
+        self._cluster_list = cluster_list
         self._cluster_max = cluster_max
         self._cluster_loop_max = cluster_loop_max
 
@@ -162,6 +168,48 @@ class Cluster:
                     break
                 
         return result
+    
+    def serialize(self):
+        """シリアライズ
+
+        Returns:
+            dict: シリアライズデータ
+        """
+        cluster_list_date = []
+        for cluster in self._cluster_list:
+            cluster_list_date.append({
+                CLUSTER_LIST_INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in cluster[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]],
+                CLUSTER_LIST_CENTER_POS_X_LIST: cluster[CLUSTER_LIST_CENTER_POS_X_LIST],
+                CLUSTER_LIST_CENTER_POS_Y_LIST: cluster[CLUSTER_LIST_CENTER_POS_Y_LIST]
+            })
+        return {
+            CLUSTER_LIST_KEY: cluster_list_date,
+            CLUSTER_MAX_KEY: self._cluster_max,
+            CLUSTER_LOOP_KEY: self._cluster_loop_max
+        }
+        
+    def desirialize(cluster_data):
+        """デシリアライズ
+
+        Args:
+            cluster_data (dict): デシリアライズ対象のデータ
+
+        Returns:
+            dict: デシリアライズデータ
+        """
+        cluster_list = []
+        for cluster in cluster_data[CLUSTER_LIST_KEY]:
+            
+            cluster_list.append({
+                CLUSTER_LIST_INDIVIDUAL_LIST_KEY: [Individual().deserialize(individual) for individual in cluster[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]],
+                CLUSTER_LIST_CENTER_POS_X_LIST: cluster[CLUSTER_LIST_CENTER_POS_X_LIST],
+                CLUSTER_LIST_CENTER_POS_Y_LIST: cluster[CLUSTER_LIST_CENTER_POS_Y_LIST]
+            })
+        return Cluster(
+            cluster_max=cluster_data[CLUSTER_MAX_KEY],
+            cluster_loop_max=cluster_data[CLUSTER_LOOP_KEY],
+            cluster_list=cluster_list
+        )
 #
 # 単体テスト
 #
