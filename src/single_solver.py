@@ -72,9 +72,9 @@ def solve(dep, num, work_num, loop_max):
                     selected_individual_list[individual2_i]
                 )
                 individual_list.append(new_individual)
-                logger.info(f"[交叉]\t{hex(id(new_individual))} -> new: {new_individual.get_schedule()}")
+                logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule()}")
             # 突然変異
             else:
                 new_individual = evolution.mutate(work_num)
                 individual_list.append(new_individual)
-                logger.info(f"[変異]\t{hex(id(new_individual))} -> new:: {new_individual.get_schedule()}")
+                logger.info(f"[変異]{hex(id(new_individual))} -> new:: {new_individual.get_schedule()}")

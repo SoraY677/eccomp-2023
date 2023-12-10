@@ -112,6 +112,7 @@ class Cluster:
             if is_some_cluster_center_change is False:
                 break
         self._cluster_list = cluster_list
+        return cluster_list
 
     def _calc_individual_pos(self, individual):
         """個体の座標を計算
