@@ -46,7 +46,7 @@ def solve(dep, num, work_num, loop_max):
     else: # データが存在している
         state = loaded_data[store.STATE_KEY]
         count = loaded_data[store.COUNT_KEY]
-        cluster = loaded_data[store.CLUSTER_KEY]
+        cluster = loaded_data[store.INDIVIDUAL_CLUSTER_KEY]
         individual_list = loaded_data[store.INDIVIDUAL_LIST_KEY]
         selected_individual_list = loaded_data[store.SELECTED_INDIVIDUAL_LIST_KEY]
         evaluation_list = loaded_data[store.EVALUATION_LIST]

@@ -18,7 +18,7 @@ CLUSTER_LIST_CENTER_POS_X_LIST = "center_pos_x_list"
 CLUSTER_LIST_CENTER_POS_Y_LIST = "center_pos_y_list"
 CLUSTER_LIST_KEY = "cluster_list"
 CLUSTER_MAX_KEY = "cluster_max"
-CLUSTER_LOOP_KEY = "cluster_key"
+CLUSTER_LOOP_KEY = "cluster_max_key"
 
 class IndividualCluster:
     _cluster_list = []

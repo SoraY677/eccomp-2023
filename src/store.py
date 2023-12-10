@@ -21,7 +21,7 @@ else:
 
 STATE_KEY = 'state'
 COUNT_KEY = "count"
-CLUSTER_KEY = "individual_cluster"
+INDIVIDUAL_CLUSTER_KEY = "individual_cluster"
 SELECTED_INDIVIDUAL_LIST_KEY = "selected_individual_list"
 INDIVIDUAL_LIST_KEY = "individual_list"
 EVALUATION_LIST = "evaluation_list"
@@ -57,7 +57,7 @@ def _deserialize(content):
     return {
         STATE_KEY: content[STATE_KEY],
         COUNT_KEY: content[COUNT_KEY],
-        CLUSTER_KEY: IndividualCluster.desirialize(content[CLUSTER_KEY]),
+        INDIVIDUAL_CLUSTER_KEY: IndividualCluster.desirialize(content[INDIVIDUAL_CLUSTER_KEY]),
         INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
         SELECTED_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
         EVALUATION_LIST: content[EVALUATION_LIST]
@@ -107,7 +107,7 @@ def _serialize(state, count, individual_cluster, individual_list, selected_indiv
     return {
         STATE_KEY: state,
         COUNT_KEY: count,
-        CLUSTER_KEY: individual_cluster.serialize(),
+        INDIVIDUAL_CLUSTER_KEY: individual_cluster.serialize(),
         INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in individual_list],
         SELECTED_INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in selected_individual_list],
         EVALUATION_LIST: evaluation_list
