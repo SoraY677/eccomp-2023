@@ -5,7 +5,10 @@
 import math
 import random
 import copy
-from constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
+if __name__ == "__main__":
+    from constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
+else:
+    from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT
 
 CLUSTER_LIST_INDIVIDUAL_LIST_KEY = "individual_list"
 CLUSTER_LIST_CLUSTER_NUM = "cluster_num"

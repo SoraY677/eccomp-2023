@@ -5,8 +5,12 @@
 # - https://ja.wikipedia.org/wiki/%E9%81%BA%E4%BC%9D%E7%9A%84%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0
 #
 import random
-from individual import Individual
-from constraints import CROSSOVER_POINT_MAX
+if __name__ == "__main__":
+    from individual import Individual
+    from constraints import CROSSOVER_POINT_MAX
+else:
+    from src.solution.individual import Individual
+    from src.solution.constraints import CROSSOVER_POINT_MAX
 
 def crossover(individual1, individual2, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
     """交叉

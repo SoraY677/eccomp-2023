@@ -1,8 +1,12 @@
 #
 # 集合
 #
-from individual import Individual
-from constraints import INITIALIZE_INDIVIDUAL_MAX_DEFAULT
+if __name__ == "__main__":
+    from individual import Individual
+    from constraints import INITIALIZE_INDIVIDUAL_MAX_DEFAULT
+else:
+    from src.solution.individual import Individual
+    from src.solution.constraints import INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 class Population:
     _individual_list: []

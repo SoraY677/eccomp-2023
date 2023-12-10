@@ -2,16 +2,17 @@
 # 処理の大枠定義用
 #
 import datetime
-from util import path_util
-from util import logger
 if __name__ == "__main__":
     import submiter
     import single_solver
     import multi_solver
+    from util import path_util
 else:
-    from . import submiter
-    from . import single_solver
-    from . import multi_solver
+    from src import submiter
+    from src import single_solver
+    from src import multi_solver
+    from src.util import path_util
+    from src.util import logger
 import sys
 
 def init(rootpath):

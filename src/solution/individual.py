@@ -3,7 +3,10 @@
 #
 import random
 import copy
-from constraints import WORK_MAX_DAY, WORK_MIN_DAY
+if __name__ == "__main__":
+    from constraints import WORK_MAX_DAY, WORK_MIN_DAY
+else:
+    from src.solution.constraints import WORK_MAX_DAY, WORK_MIN_DAY
 
 INDIVIDUAL_CONTENT_SCHEDULE_KEY = "schedule"
 INDIVIDUAL_CONTENT_WEIGHTS_KEY = "weights" # Todo: 多目的部門用。後で実装
@@ -59,7 +62,7 @@ class Individual:
             end_time = schedule_list[i+1]
             
             if end_time < start_time:
-                end_time[i+1] = random.randint(start_time, WORK_MAX_DAY)
+                end_time = random.randint(start_time, WORK_MAX_DAY)
             result.append(start_time)
             result.append(end_time)
         

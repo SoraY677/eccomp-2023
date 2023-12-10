@@ -4,7 +4,10 @@
 import sys
 import subprocess
 import json
-from util import logger
+if __name__ == "__main__":
+    from util import logger
+else:
+    from src.util import logger
 
 SOLVE_SINGLE_ID = 's' # 単目的
 SOLVE_MULTI_ID  = 'm' # 多目的
@@ -114,18 +117,29 @@ def _exec_submit_command(dep, num, ans):
     Returns:
         dict: 成功:レスポンス|失敗:カラ辞書型配列
     """
-    match_num = _get_match_num(dep, num)
+    # match_num = _get_match_num(dep, num)
     
-    command = f'echo \'{ans}\' | opt submit --match={match_num}'
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    # command = f'echo \'{ans}\' | opt submit --match={match_num}'
+    # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
 
-    try:
-        response = _decode_response(proc.communicate()[0])
-    except Exception as e:
-        logger.warn(e)
-        response = {}
+    # try:
+    #     response = _decode_response(proc.communicate()[0])
+    # except Exception as e:
+    #     logger.warn(e)
+    #     response = {}
 
-    return response
+    # return response
+    
+    # mock
+    return {
+        "objective": 1550.5,
+        "constraint": None,
+        "error": "エラー文",
+        "info": {
+            "exe_time": 503.223,
+            "delays": [0.0, 0.0, 30.5, 14.5,...]
+	}
+}
 
 def create_ans(dep, schedule, weights=None, timeout=TIMEOUT):
     ans = {
@@ -145,9 +159,7 @@ def submit(dep, num, ans):
         num (int): 問題番号
         ans (any): 解
     """
-    # Todo:テストできていないので、テストコードなど修正
-    # return _exec_submit_command(dep, num, ans)
-    pass
+    return _exec_submit_command(dep, num, ans)
 # 
 # 単体テスト
 #

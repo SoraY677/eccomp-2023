@@ -50,7 +50,7 @@ def _common(text, level):
     func = _log_func[level]
     if func is None:
         sys.exit(1)
-    func(text)
+    func(text, stacklevel=3)
 
 def debug(text):
     """debug出力

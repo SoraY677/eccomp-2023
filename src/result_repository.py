@@ -6,9 +6,14 @@ import os.path as path
 import datetime
 import glob
 import sys
-from util import json_operator
-from util import path_util
-from util import logger
+if __name__ == "__main__":
+    from util import json_operator
+    from util import path_util
+    from util import logger
+else:
+    from src.util import json_operator
+    from src.util import path_util
+    from src.util import logger
 
 def create_result_dict(count, ans, response):
     """結果のdictを生成
@@ -24,7 +29,7 @@ def create_result_dict(count, ans, response):
     return {
         "count": count,
         "ans": ans,
-        "objective": response
+        "objective": response["objective"]
     }
 
 def load(filepath):

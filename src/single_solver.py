@@ -2,17 +2,22 @@
 # 単目的用ソルバ
 #
 import random
-from util import logger
-from solution import evolution
-from solution.population import Population
-from solution.cluster import Cluster
-from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE
 if __name__ == "__main__":
     import submiter
     import result_repository
+    from util import logger
+    from solution import evolution
+    from solution.population import Population
+    from solution.cluster import Cluster
+    from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE
 else:
-    from . import submiter
-    from . import result_repository
+    from src import submiter
+    from src import result_repository
+    from src.util import logger
+    from src.solution import evolution
+    from src.solution.population import Population
+    from src.solution.cluster import Cluster
+    from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE
 
 def solve(dep, num, work_num, loop_max):
     population = Population(work_num)
@@ -34,7 +39,7 @@ def solve(dep, num, work_num, loop_max):
         objective_list = []
         for individual in selected_individual_list:
             # 提出用解情報の生成
-            ans = submiter.create_ans(dep, individual)
+            ans = submiter.create_ans(dep, individual.get_schedule())
             response = submiter.submit(dep, num, ans)
             # 解の保存
             result_dict = result_repository.create_result_dict(count, ans, response)
@@ -56,7 +61,7 @@ def solve(dep, num, work_num, loop_max):
                 individual_index_list = [i for i in range(len(selected_weight))]
                 individual1_i = random.choices(individual_index_list, k = 1, weights = selected_weight)[0]
                 selected_weight[individual1_i] = 0
-                individual2_i = random.choices(selected_individual_list, k = 1, weights = selected_weight)[0]
+                individual2_i = random.choices(individual_index_list, k = 1, weights = selected_weight)[0]
                 new_individual = evolution.crossover(
                     selected_individual_list[individual1_i],
                     selected_individual_list[individual2_i]
