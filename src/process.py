@@ -8,12 +8,10 @@ if __name__ == "__main__":
     import submiter
     import single_solver
     import multi_solver
-    import result_repository
 else:
     from . import submiter
     from . import single_solver
     from . import multi_solver
-    from . import result_repository
 import sys
 
 def init(rootpath):
@@ -35,22 +33,22 @@ def run(dep, num):
         num (int): 問題番号
     """
     submit_max = submiter.get_submit_max(dep, num)
-    prev_result_dict = result_repository.get_result_file_path_list_order_by_count_desc(dep, num, 0)
+    work_num = submiter.get_work_num(dep, num)
         
-    for i in range(submit_max):
-        count = i+1
-        logger.info(f"==========第{count}回目==========")
-        # 解算出
-        if dep == submiter.SOLVE_SINGLE_ID :
-            ans = single_solver.solve()
-        elif dep == submiter.SOLVE_MULTI_ID :
-            ans = multi_solver.solve()
-        # 解提出
-        response = submiter.submit(dep, num, ans)
-        result_dict = result_repository.create_result_dict(count, ans, response)
-        result_repository.save(dep, num, count, result_dict)
-        prev_result_dict = result_dict
-        logger.info(f"============================")
+    if dep == submiter.SOLVE_SINGLE_ID :
+        single_solver.solve(
+            dep,
+            num,
+            work_num,
+            submit_max
+        )
+    elif dep == submiter.SOLVE_MULTI_ID :
+        multi_solver.solve(
+            dep,
+            num,
+            work_num,
+            submit_max
+        )
 
 def terminate():
     """終了時
