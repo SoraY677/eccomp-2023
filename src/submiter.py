@@ -14,28 +14,33 @@ QUESTION_MAP = {
     # https://ec-comp.jpnsec.org/ja/matches/93
     f"{SOLVE_SINGLE_ID}0": {
         "match_num": 93,
-        "submit_max": 10000
+        "submit_max": 10000,
+        "work_num": 8
     },
     # https://ec-comp.jpnsec.org/ja/matches/94
     f"{SOLVE_SINGLE_ID}1": {
         "match_num": 94,
-        "submit_max": 1000
+        "submit_max": 1000,
+        "work_num": 20
     },
     # https://ec-comp.jpnsec.org/ja/matches/95
     f"{SOLVE_SINGLE_ID}2": {
         "match_num": 95,
-        "submit_max": 1000
+        "submit_max": 1000,
+        "work_num": 23
     },
     ### 多目的
     # https://ec-comp.jpnsec.org/ja/matches/96
     f"{SOLVE_MULTI_ID}0": {
         "match_num": 96,
-        "submit_max": 10000
+        "submit_max": 10000,
+        "work_num": 8
     },
     # https://ec-comp.jpnsec.org/ja/matches/97
     f"{SOLVE_MULTI_ID}1": {
         "match_num": 97,
-        "submit_max": 1000
+        "submit_max": 1000,
+        "work_num": 20
     }
 }
 
@@ -73,6 +78,15 @@ def get_submit_max(dep, num):
         logger.error(f"問題のID`{dep}{num}`は存在しない")
         sys.exit(1)
     return submit_max
+
+def get_work_num(dep, num):
+    key = f"{dep}{num}"
+    if key in QUESTION_MAP:
+        work_num = QUESTION_MAP[f"{dep}{num}"]["work_num"]
+    else:
+        logger.error(f"問題のID`{dep}{num}`は存在しない")
+        sys.exit(1)
+    return work_num
 
 def _decode_response(response_txt):
     """レスポンスのデコード
@@ -153,5 +167,17 @@ if __name__ == "__main__":
             logger.init()
             with self.assertRaises(SystemExit):
                 get_submit_max('n', 1)
+
+        def test_get_work_num(self):
+            """ワーク番号の取得
+            """
+            work_num = get_work_num('s', 1)
+            self.assertTrue(work_num == 20)
+        def test_get_work_num_error(self):
+            """問題指定用番号のミス
+            """
+            logger.init()
+            with self.assertRaises(SystemExit):
+                get_work_num('n', 1)
 
     unittest.main()
