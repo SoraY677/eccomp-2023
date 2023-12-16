@@ -202,9 +202,29 @@ class Individual:
         
         return Individual(schedule_list, weight_list)
         
+    def create_individual_id(schedule_list=[], weight_list=[]):
+        """個体IDを生成
+
+        Args:
+            schedule_list (list, optional): スケジュールのリスト. Defaults to [].
+            weight_list (list, optional): SCIP重みリスト. Defaults to [].
+
+        Returns:
+            str: 個体ID
+        """
+        return "-".join(map(str, schedule_list)) + '|' + '-'.join(map(str, weight_list))
+
     def is_allow_generate(self, ban_generation_list):
-        # Todo:後で実装
-        return True
+        """生成が許可されるか
+
+        Args:
+            ban_generation_list (list): 禁止リスト
+
+        Returns:
+            bool: 許可されたかどうか
+        """
+        self_id = Individual.create_individual_id(self.get_schedule_list(), self.get_weight_list())
+        return self_id not in ban_generation_list
 #
 # 単体テスト
 #

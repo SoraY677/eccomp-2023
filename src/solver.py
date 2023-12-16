@@ -11,7 +11,7 @@ from util import logger
 from solution import evolution
 from solution.individual import Individual
 from solution.cluster import Cluster
-from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
+from solution.constraints import CLUSTER_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 STATE_LOOP_HEAD = 0
 STATE_INDIVIDUAL_SELECT = 1
@@ -42,6 +42,7 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
         individual_list = [Individual(work_num=work_num, weight_num=weight_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
+        ban_generation_list = []
     else: # データが存在している
         state = loaded_data[store.STATE_KEY]
         count = loaded_data[store.COUNT_KEY]
@@ -49,13 +50,14 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
         individual_list = loaded_data[store.INDIVIDUAL_LIST_KEY]
         selected_individual_list = loaded_data[store.SELECTED_INDIVIDUAL_LIST_KEY]
         evaluation_list = loaded_data[store.EVALUATION_LIST]
+        ban_generation_list = loaded_data[store.BAN_GENERATE_LIST]
         logger.info(f"[system restarted]")
     
     while(count <= loop_max):
         if state == STATE_LOOP_TAIL:
             logger.info(f"==========第{count}回目==========")
             state = STATE_LOOP_HEAD
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
         if state == STATE_LOOP_HEAD:
             # 解選択フェーズ
             cluster.generate(individual_list)
@@ -66,13 +68,18 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
             for individual in selected_individual_list:
                 logger.info(f'{hex(id(individual))} -> [select] schedule:{individual.get_schedule_list()} weight:{individual.get_weight_list()}')
             state = STATE_INDIVIDUAL_SELECT
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
         if state == STATE_INDIVIDUAL_SELECT:
             # 解評価フェーズ
             evaluation_list = submiter.submit(dep, num, selected_individual_list, is_debug)
-            for evaluation in evaluation_list: logger.info(f"submit result: {evaluation}")
+            for evaluation in evaluation_list: 
+                logger.info(f"submit result: {evaluation}")
+                ban_generation_list.append(Individual.create_individual_id(
+                    evaluation[submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY],
+                    evaluation[submiter.ANS_KEY][submiter.INPUT_FORMAT_WEIGHT_KEY]
+                ))
             state = STATE_EVALUATION
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
         if state == STATE_EVALUATION:
             # 解改善フェーズ
             individual_list = []
@@ -99,8 +106,8 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
                     individual_list.append(new_individual)
                     logger.info(f"[変異]{hex(id(new_individual))} -> [new] schedule:{new_individual.get_schedule_list()} weight:{new_individual.get_weight_list()}")
             state = STATE_EVOLVE
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
         if state == STATE_EVOLVE:
             state = STATE_LOOP_TAIL
-            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+            store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
             count += 1

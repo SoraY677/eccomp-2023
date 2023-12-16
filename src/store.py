@@ -21,6 +21,7 @@ WEIGHT_CLUSTER_KEY = "weight_cluster"
 SELECTED_INDIVIDUAL_LIST_KEY = "selected_individual_list"
 INDIVIDUAL_LIST_KEY = "individual_list"
 EVALUATION_LIST = "evaluation_list"
+BAN_GENERATE_LIST = "ban_generate_list"
 
 _is_store = False
 
@@ -69,10 +70,11 @@ def _deserialize(content):
         CLUSTER_KEY: Cluster.deserialize(content[CLUSTER_KEY]),
         INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
         SELECTED_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
-        EVALUATION_LIST: content[EVALUATION_LIST]
+        EVALUATION_LIST: content[EVALUATION_LIST],
+        BAN_GENERATE_LIST: content[BAN_GENERATE_LIST]
     }
 
-def save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list):
+def save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list):
     """保存
 
     Args:
@@ -84,6 +86,7 @@ def save(dep, num, state, count, cluster, individual_list, selected_individual_l
         individual_list (list): 生成した個体群
         selected_individual_list (list): 選択された個体群
         evaluation_list(list): 評価リスト
+        ban_generation_list(list): 作成禁止リスト
     Returns:
         str: ファイルパス
     """
@@ -94,14 +97,14 @@ def save(dep, num, state, count, cluster, individual_list, selected_individual_l
         os.mkdir(dirpath)
     filepath = path.join(dirpath, f"r{dep}{num}-{str(count).zfill(10)}-{state}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
     
-    data = _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list)
+    data = _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list)
     error = json_operator.write(filepath, data)
     if error is not None:
         logger.error(error)
         sys.exit(1)
     return filepath
 
-def _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list):
+def _serialize(state, count, cluster, individual_list, selected_individual_list, evaluation_list, ban_generation_list):
     """シリアライズ
 
     Args:
@@ -111,6 +114,7 @@ def _serialize(state, count, cluster, individual_list, selected_individual_list,
         individual_list (list): 生成した個体群
         selected_individual_list (list): 選択された個体群
         evaluation_list(list): 評価リスト
+        ban_generation_list(list): 作成禁止リスト
 
     Returns:
         dict: シリアライズ後のデータ
@@ -121,7 +125,8 @@ def _serialize(state, count, cluster, individual_list, selected_individual_list,
         CLUSTER_KEY: cluster.serialize(),
         INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in individual_list],
         SELECTED_INDIVIDUAL_LIST_KEY: [individual.serialize() for individual in selected_individual_list],
-        EVALUATION_LIST: evaluation_list
+        EVALUATION_LIST: evaluation_list,
+        BAN_GENERATE_LIST: ban_generation_list
     }
 
 def get_result_file_path_list_order_by_count_desc(dep, num):
