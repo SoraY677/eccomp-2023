@@ -50,6 +50,7 @@ QUESTION_MAP = {
 
 WEIGHT_NUM = 4
 TIMEOUT = 3000
+OBJECTIVE_MAX = sys.maxsize
 
 INPUT_FORMAT_SCHEDULE_KEY = 'schedule'
 INPUT_FORMAT_WEIGHT_KEY = 'weights'
@@ -169,7 +170,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
         ans = ans_list[ans_i]
         if len(proc_list) == len(ans_list):
             proc = proc_list[ans_i]
-        objective = 1000 # Todo: 後で最適なものを考える
+        objective = OBJECTIVE_MAX
         constraint = None
         info = {}
         try:
