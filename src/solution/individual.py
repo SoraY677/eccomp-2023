@@ -101,6 +101,7 @@ class Individual:
         Returns:
             list: プロット用リスト
         """
+        # Todo: スケジュールと重みのプロット幅が異なることから正しくプロットできていないので修正して
         result = []
         # スケジュール
         # x -> 工数 = endtime - starttime
