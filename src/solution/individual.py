@@ -128,17 +128,19 @@ class Individual:
 
         return result
     
-    def get_plot_max(work_num, weight_num):
+    def get_plot_max(work_num=-1, weight_num=-1):
         """プロット配列の数を取得
 
         Args:
-            work_num (int, optional): ワーク数. Defaults to None.
-            weight_num (float, optional): SCIP重み数. Defaults to None.
+            work_num (int, optional): ワーク数. Defaults to -1.
+            weight_num (float, optional): SCIP重み数. Defaults to -1.
 
         Returns:
             int: プロット配列数
         """
-        return int(work_num + (weight_num-1)*(weight_num)/2)
+        work_max = work_num if work_num != -1 else 0
+        weight_max = (weight_num-1)*(weight_num)/2 if weight_num != -1 else 0
+        return int(work_max + weight_max)
     
     def serialize(self):
         """シリアライズ
