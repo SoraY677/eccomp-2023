@@ -101,7 +101,6 @@ class Individual:
         Returns:
             list: プロット用リスト
         """
-        # Todo: スケジュールと重みのプロット幅が異なることから正しくプロットできていないので修正して
         result = []
         # スケジュール
         # x -> 工数 = endtime - starttime
@@ -119,8 +118,8 @@ class Individual:
             for line_i in range(1, len(weight_list), 1):
                 for row_i in range(line_i):
                     result.append({
-                        INDIVIDUAL_PLOT_LIST_X_KEY: weight_list[row_i],
-                        INDIVIDUAL_PLOT_LIST_Y_KEY: weight_list[line_i],
+                        INDIVIDUAL_PLOT_LIST_X_KEY: weight_list[row_i] * WORK_MAX_DAY,
+                        INDIVIDUAL_PLOT_LIST_Y_KEY: weight_list[line_i] * WORK_MAX_DAY, # 他との帳尻合わせで調整 
                     })
 
         if len(result) != Individual.get_plot_max(len(schedule_list)/2, len(weight_list)):
