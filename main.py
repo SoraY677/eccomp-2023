@@ -16,7 +16,7 @@ def main(dep, num, debug, store):
         num (string): int
     """
     process.init(dep, num, os.getcwd(), debug, store)
-    process.run(dep, num)
+    process.run(dep, num, debug)
     process.terminate()
 
 if __name__ == '__main__':

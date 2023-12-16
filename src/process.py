@@ -32,12 +32,13 @@ def init(dep, num, rootpath, is_debug, is_store):
     
     logger.info(f"[program start] {datetime.datetime.now()}")
     
-def run(dep, num):
+def run(dep, num, is_debug):
     """メイン実行
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
+        is_debug (bool): デバッグモード
     """
     submit_max = submiter.get_submit_max(dep, num)
     work_num = submiter.get_work_num(dep, num)
@@ -48,7 +49,8 @@ def run(dep, num):
             dep,
             num,
             work_num,
-            submit_max
+            submit_max,
+            is_debug
         )
     elif dep == submiter.SOLVE_MULTI_ID :
         multi_solver.solve(
@@ -56,7 +58,8 @@ def run(dep, num):
             num,
             work_num,
             weight_num,
-            submit_max
+            submit_max,
+            is_debug
         )
 
 def terminate():

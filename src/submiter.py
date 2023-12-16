@@ -2,6 +2,7 @@
 # 解提出管理
 #
 import sys
+import random
 import subprocess
 import json
 from os import path
@@ -111,6 +112,99 @@ def get_work_num(dep, num):
 def get_weight_num():
     return WEIGHT_NUM
 
+def submit(dep, num, individual_list, is_debug):
+    """解提出
+
+    Args:
+        dep (string): 問題部門
+        num (int): 問題番号
+        individual_list (list): 個体群のリスト
+        is_debug (bool): デバッグモードフラグ
+    """
+    return _exec_submit_command(dep, num, individual_list, is_debug)
+
+
+def _exec_submit_command(dep, num, individual_list, is_debug):
+    """実行コマンド
+
+    Args:
+        dep (string): 問題部門
+        num (int): 問題番号
+        individual_list (list): 個体群のリスト
+        is_debug (bool): デバッグモードフラグ
+    Returns:
+        dict: 成功:レスポンス|失敗:カラ辞書型配列
+    """
+    ans_list = _create_ans_list(individual_list)
+    result = [{} for _ in range(len(ans_list))]
+    proc_list = []
+    for ans in ans_list:
+        if is_debug:
+            response = _decode_response(_exec_submit_mock(dep))
+        else:
+            match_num = _get_match_num(dep, num)
+            command = f'echo \'{ans}\' | opt submit --match={match_num}'
+            # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        
+    for ans_i in range(len(ans_list)):
+        ans = ans_list[ans_i]
+        if len(proc_list) == len(ans_list):
+            proc = proc_list[ans_i]
+        objective = sys.maxsize
+        constraint = None
+        info = {}
+        try:
+            if is_debug:
+                response = _decode_response(_exec_submit_mock(dep, ans_list))
+            else:
+                # response = proc.communicate()[0]
+                pass
+            decorded_response = _decode_response(response)
+            objective = decorded_response[OUTPUT_FORMAT_OBJECTIVE_KEY]
+            constraint = decorded_response[OUTPUT_FORMAT_CONSTRAINT_KEY]
+            error_text = decorded_response[OUTPUT_FORMAT_ERROR_KEY]
+            info = decorded_response[OUTPUT_FORMAT_INFO_KEY]
+        except Exception as e:
+            logger.error('submit fail! (or solution broken)')
+            error_text = e
+            
+        result[ans_i] = {
+            ANS_KEY: {
+                INPUT_FORMAT_SCHEDULE_KEY: ans.get(INPUT_FORMAT_SCHEDULE_KEY, []),
+                INPUT_FORMAT_WEIGHT_KEY: ans.get(INPUT_FORMAT_WEIGHT_KEY, []),
+                INPUT_FORMAT_TIMEOUT_KEY: ans.get(INPUT_FORMAT_TIMEOUT_KEY, -1)
+            },
+            EVAL_KEY: {
+                OUTPUT_FORMAT_OBJECTIVE_KEY: objective,
+                OUTPUT_FORMAT_CONSTRAINT_KEY: constraint,
+                OUTPUT_FORMAT_ERROR_KEY: error_text,
+                OUTPUT_FORMAT_INFO_KEY: info
+            }
+        }
+    for proc in proc_list:
+        proc.terminate()
+
+    return result
+
+def _create_ans_list(individual_list, timeout=TIMEOUT):
+    ans_list = []
+    for individual in individual_list:
+        schdule_list = individual.get_schedule_list()
+        weight_list = individual.get_weight_list()
+
+        ans = {}
+        if len(schdule_list) != 0:
+            ans[INPUT_FORMAT_SCHEDULE_KEY] = schdule_list
+        if len(weight_list) != 0:
+            ans[INPUT_FORMAT_WEIGHT_KEY] = weight_list
+            
+        ans[INPUT_FORMAT_TIMEOUT_KEY] = timeout
+        
+        ans_list.append(ans)
+        
+    return ans_list
+    
+
 def _decode_response(response_txt):
     """レスポンスのデコード
 
@@ -121,53 +215,51 @@ def _decode_response(response_txt):
         dict: レスポンス内容の辞書型
     """
     decoded_response = json.loads(response_txt)
-    logger.info(f'レスポンス: {decoded_response}')
+    logger.info(f'response: {decoded_response}')
     return decoded_response
 
-def _exec_submit_command(dep, num, ans_list):
-    """実行コマンド
+def _exec_submit_mock(dep):
+    if dep == SOLVE_SINGLE_ID:
+        return _exec_submit_single_mock()
+    elif dep == SOLVE_MULTI_ID:
+        return _exec_submit_multi_mock()
 
-    Args:
-        dep (string): 問題部門
-        num (int): 問題番号
-        ans_list (list): 解答リスト
+def _exec_submit_single_mock():
+    return """
+{
+    "objective": 1550.5,
+    "constraint": null,
+    "error": "エラー文",
+    "info": {
+        "exe_time": 503.223,
+        "delays": [0.0, 0.0, 30.5, 14.5]
+    }
+}
+"""
 
-    Returns:
-        dict: 成功:レスポンス|失敗:カラ辞書型配列
-    """
-    # match_num = _get_match_num(dep, num)
-    
-    # command = f'echo \'{ans}\' | opt submit --match={match_num}'
-    # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-
-    # try:
-    #     response = _decode_response(proc.communicate()[0])
-    # except Exception as e:
-    #     logger.warn(e)
-    #     response = {}
-
-    # return response
-    
-    # mock
-    result = []
-    for ans in ans_list:
-        result.append({
-            ANS_KEY: {
-                INPUT_FORMAT_SCHEDULE_KEY: ans.get(INPUT_FORMAT_SCHEDULE_KEY, []),
-                INPUT_FORMAT_WEIGHT_KEY: ans.get(INPUT_FORMAT_WEIGHT_KEY, []),
-                INPUT_FORMAT_TIMEOUT_KEY: ans.get(INPUT_FORMAT_TIMEOUT_KEY, -1)
-            },
-            EVAL_KEY: {
-                OUTPUT_FORMAT_OBJECTIVE_KEY: 1550.5,
-                OUTPUT_FORMAT_CONSTRAINT_KEY: None,
-                OUTPUT_FORMAT_ERROR_KEY: "エラー文",
-                OUTPUT_FORMAT_INFO_KEY: {
-                    OUTPUT_FORMAT_INFO_EXETIME_KEY: 503.223,
-                    OUTPUT_FORMAT_INFO_DELAYS_KEY: [0.0, 0.0, 30.5, 14.5]
+def _exec_submit_multi_mock():
+    if random.random < 0.5:
+        return """
+            {
+                "objective": [-72000.0, 0.0, 0.0, 0.0],
+                "constraint": null,
+                "error": "エラー文",
+                "info": {
+                    "exe_time": 0.77885173400864,
                 }
             }
-        })
-    return result
+        """
+    else:
+        return """
+            {
+                "objective": null,
+                "constraint": null,
+                "error": "エラー文",
+                "info": {
+                    "exe_time": 0.77885173400864,
+                }
+            }
+        """
 
 def create_ans_list(dep, input_solution, timeout=TIMEOUT):
     """解のリストを生成
@@ -191,16 +283,6 @@ def create_ans_list(dep, input_solution, timeout=TIMEOUT):
         ans_list.append(ans)
     
     return ans_list
-
-def submit(dep, num, ans_list):
-    """解提出
-
-    Args:
-        dep (string): 問題部門
-        num (int): 問題番号
-        ans_list (any): 解のリスト
-    """
-    return _exec_submit_command(dep, num, ans_list)
 
 # 
 # 単体テスト

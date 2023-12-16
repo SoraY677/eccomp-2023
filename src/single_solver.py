@@ -19,7 +19,7 @@ STATE_EVALUATION = 2
 STATE_EVOLVE = 3
 STATE_LOOP_TAIL = 4
 
-def solve(dep, num, work_num, loop_max):
+def solve(dep, num, work_num, loop_max, is_debug):
     """解実行
 
     Args:
@@ -27,6 +27,7 @@ def solve(dep, num, work_num, loop_max):
         num (int): 問題番号
         work_num (int): ワーク数
         loop_max (int): ループ数
+        is_debug (bool): デバッグフラグ
     """
     loaded_data = store.load(dep, num)
     
@@ -67,13 +68,7 @@ def solve(dep, num, work_num, loop_max):
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_INDIVIDUAL_SELECT:
             # 解評価フェーズ
-            schedule_list = []
-            for individual in selected_individual_list:
-                schedule_list.append({
-                    submiter.INPUT_FORMAT_SCHEDULE_KEY: individual.get_schedule_list()
-                })
-            ans_list = submiter.create_ans_list(dep, schedule_list)
-            evaluation_list = submiter.submit(dep, num, ans_list)
+            evaluation_list = submiter.submit(dep, num, selected_individual_list, is_debug)
             logger.info(f"submit result: {evaluation_list}")
             state = STATE_EVALUATION
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
