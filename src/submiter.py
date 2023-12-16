@@ -144,7 +144,8 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
         else:
             match_num = _get_match_num(dep, num)
             command = f'echo \'{ans}\' | opt submit --match={match_num}'
-            # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+            # Todo:
+            # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) 
         
     for ans_i in range(len(ans_list)):
         ans = ans_list[ans_i]
@@ -157,6 +158,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             if is_debug:
                 response = _decode_response(_exec_submit_mock(dep, ans_list))
             else:
+                # Todo:
                 # response = proc.communicate()[0]
                 pass
             decorded_response = _decode_response(response)
