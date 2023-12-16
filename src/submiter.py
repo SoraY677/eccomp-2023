@@ -175,10 +175,11 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
                 proc_list.append(proc)
                 response = _decode_response(proc.communicate()[0])
             if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
-                objective = -1 * response[OUTPUT_FORMAT_OBJECTIVE_KEY][0] + \
-                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][1] + \
-                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][2] + \
-                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][3]
+                actually_objective = []
+                for weight_i, weight in enumerate(ans.get(INPUT_FORMAT_WEIGHT_KEY, [])):
+                    objective = response[OUTPUT_FORMAT_OBJECTIVE_KEY][weight_i]
+                    actually_objective.append(objective * weight)
+                objective = sys.maxsize / 2 - min(actually_objective)
             elif isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], float):
                 objective = response[OUTPUT_FORMAT_OBJECTIVE_KEY]
             constraint = response[OUTPUT_FORMAT_CONSTRAINT_KEY]

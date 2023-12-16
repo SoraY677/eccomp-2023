@@ -17,5 +17,5 @@ MUTATE_RATE = 0.1 # 突然変異率
 
 # クラスタ関連
 CLUSTER_MAX_DEFAULT = 20 # クラスタリング数
-CLUSTER_LOOP_MAX_DEFAULT = 100 # 重心算出回数の上限
+CLUSTER_LOOP_MAX_DEFAULT = 10000 # 重心算出回数の上限
 
