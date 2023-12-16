@@ -10,6 +10,7 @@ import submiter
 import single_solver
 import multi_solver
 from util import path_util
+from util import logger
 
 def init(dep, num, rootpath):
     """初期化
