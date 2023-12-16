@@ -69,7 +69,7 @@ def _get_match_num(dep, num):
     """問題指定用番号を取得
 
     Args:
-        dep (string): 問題部門
+        dep (str): 問題部門
         num (int): 問題番号
     Returns:
         int: 問題指定用番号
@@ -101,6 +101,14 @@ def get_submit_max(dep, num):
     return submit_max
 
 def get_work_num(dep, num):
+    """ワーク数を取得
+
+    Args:
+        dep (str): 問題部門
+        num (int): 問題番号
+    Returns:
+        int: ワーク数
+    """
     key = f"{dep}{num}"
     if key in QUESTION_MAP:
         work_num = QUESTION_MAP[f"{dep}{num}"]["work_num"]
@@ -109,8 +117,19 @@ def get_work_num(dep, num):
         sys.exit(1)
     return work_num
 
-def get_weight_num():
-    return WEIGHT_NUM
+def get_weight_num(dep):
+    """SCIP重み数を返す
+
+    Args:
+        dep (str): 問題部門
+
+    Returns:
+        int: 重み数
+    """
+    if dep == SOLVE_MULTI_ID:
+        return WEIGHT_NUM
+    
+    return 0
 
 def submit(dep, num, individual_list, is_debug):
     """解提出

@@ -21,8 +21,8 @@ class Individual:
         schedule_list = None,
         weight_list = None,
         ban_generation_list = [],
-        work_num = None,
-        weight_num = None
+        work_num = 0,
+        weight_num = 0
     ):
         """初期化
 
@@ -30,17 +30,17 @@ class Individual:
             schedule_list (int[], optional): スケジュールの配列. Defaults to None.
             weight_list (float[], optional): _description_. Defaults to None.
             ban_generation_list (list, optional): _description_. Defaults to [].
-            work_num (int, optional): ワーク数. Defaults to None.
-            weight_num (float, optional): SCIP重み数. Defaults to None.
+            work_num (int, optional): ワーク数. Defaults to 0.
+            weight_num (float, optional): SCIP重み数. Defaults to 0.
         """
         self._content = {
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: [],
             INDIVIDUAL_CONTENT_WEIGHTS_KEY: []
         }
         while True:
-            if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]) == 0 and schedule_list is None and work_num is not None:
+            if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]) == 0 and schedule_list is None and work_num > 0:
                 self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create_random_schedule_list(work_num)
-            if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]) == 0 and weight_list is None and weight_num is not None:
+            if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]) == 0 and weight_list is None and weight_num > 0:
                 self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = self._create_random_weight_list(weight_num)
             if self.is_allow_generate(ban_generation_list):
                 break
@@ -128,7 +128,7 @@ class Individual:
 
         return result
 
-    def get_plot_max(work_num=-1, weight_num=-1):
+    def get_plot_max(work_num=0, weight_num=0):
         """プロット配列の数を取得
 
         Args:
@@ -138,8 +138,8 @@ class Individual:
         Returns:
             int: プロット配列数
         """
-        work_max = work_num if work_num != -1 else 0
-        weight_max = (weight_num-1)*(weight_num)/2 if weight_num != -1 else 0
+        work_max = work_num
+        weight_max = (weight_num-1)*(weight_num)/2 if weight_num > 0 else 0
         return int(work_max + weight_max)
 
     def serialize(self):

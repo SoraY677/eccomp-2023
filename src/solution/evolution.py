@@ -44,7 +44,7 @@ def crossover(parent_individual, child_individual, ban_generation_list = [], cro
 
     return individual
 
-def mutate(work_num=None, weight_num=None):
+def mutate(work_num=0, weight_num=0):
     """突然変異
 
     Args:

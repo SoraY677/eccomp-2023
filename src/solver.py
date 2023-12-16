@@ -1,5 +1,5 @@
 #
-# 単目的用ソルバ
+# ソルバ
 #
 import random
 from os import path
@@ -19,13 +19,14 @@ STATE_EVALUATION = 2
 STATE_EVOLVE = 3
 STATE_LOOP_TAIL = 4
 
-def solve(dep, num, work_num, loop_max, is_debug):
+def solve(dep, num, work_num, weight_num, loop_max, is_debug):
     """解実行
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
         work_num (int): ワーク数
+        weight_num (int): SCIP重み数
         loop_max (int): ループ数
         is_debug (bool): デバッグフラグ
     """
@@ -35,10 +36,10 @@ def solve(dep, num, work_num, loop_max, is_debug):
         state = STATE_LOOP_TAIL
         count = 1
         cluster = Cluster(
-            plot_max=Individual.get_plot_max(work_num),
+            plot_max=Individual.get_plot_max(work_num, weight_num),
             cluster_max=CLUSTER_MAX_DEFAULT,
             cluster_loop_max=1)
-        individual_list = [Individual(work_num=work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
+        individual_list = [Individual(work_num=work_num, weight_num=weight_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
     else: # データが存在している
@@ -92,7 +93,7 @@ def solve(dep, num, work_num, loop_max, is_debug):
                     logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
                 # 突然変異
                 else:
-                    new_individual = evolution.mutate(work_num)
+                    new_individual = evolution.mutate(work_num, weight_num)
                     individual_list.append(new_individual)
                     logger.info(f"[変異]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
             state = STATE_EVOLVE

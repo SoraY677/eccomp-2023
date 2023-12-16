@@ -7,8 +7,7 @@ from os import path
 import sys
 sys.path.append(path.dirname(__file__))
 import submiter
-import single_solver
-import multi_solver
+import solver
 import store
 from util import path_util
 from util import logger
@@ -42,25 +41,16 @@ def run(dep, num, is_debug):
     """
     submit_max = submiter.get_submit_max(dep, num)
     work_num = submiter.get_work_num(dep, num)
-    weight_num = submiter.get_weight_num()
+    weight_num = submiter.get_weight_num(dep)
         
-    if dep == submiter.SOLVE_SINGLE_ID :
-        single_solver.solve(
-            dep,
-            num,
-            work_num,
-            submit_max,
-            is_debug
-        )
-    elif dep == submiter.SOLVE_MULTI_ID :
-        multi_solver.solve(
-            dep,
-            num,
-            work_num,
-            weight_num,
-            submit_max,
-            is_debug
-        )
+    solver.solve(
+        dep,
+        num,
+        work_num,
+        weight_num,
+        submit_max,
+        is_debug
+    )
 
 def terminate():
     """終了時
