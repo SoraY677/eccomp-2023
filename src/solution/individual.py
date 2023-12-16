@@ -29,7 +29,7 @@ class Individual:
             weight_list (float[], optional): _description_. Defaults to None.
             ban_generation_list (list, optional): _description_. Defaults to [].
             work_num (int, optional): ワーク数. Defaults to None.
-            weight_num (float, optional): _description_. Defaults to None.
+            weight_num (float, optional): SCIP重み数. Defaults to None.
         """
         self._content = {
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: [],
@@ -105,7 +105,7 @@ class Individual:
         # スケジュール
         # x -> 工数 = endtime - starttime
         # y -> 優先度 = starttime
-        schedule_list= self.get_schedule_list()
+        schedule_list = self.get_schedule_list()
         if len(schedule_list) != 0:
             result.extend([{
                 INDIVIDUAL_PLOT_LIST_X_KEY: schedule_list[i+1] - schedule_list[i],
@@ -122,7 +122,22 @@ class Individual:
                         INDIVIDUAL_PLOT_LIST_Y_KEY: weight_list[line_i],
                     })
 
+        if len(result) != Individual.get_plot_max(len(schedule_list)/2, len(weight_list)):
+            return None
+
         return result
+    
+    def get_plot_max(work_num, weight_num):
+        """プロット配列の数を取得
+
+        Args:
+            work_num (int, optional): ワーク数. Defaults to None.
+            weight_num (float, optional): SCIP重み数. Defaults to None.
+
+        Returns:
+            int: プロット配列数
+        """
+        return int(work_num + (weight_num-1)*(weight_num)/2)
     
     def serialize(self):
         """シリアライズ
