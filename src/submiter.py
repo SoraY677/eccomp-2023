@@ -158,18 +158,9 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
     ans_list = _create_ans_list(individual_list)
     result = [{} for _ in range(len(ans_list))]
     proc_list = []
-    for ans in ans_list:
-        if is_debug:
-            response = _decode_response(_exec_submit_mock(dep))
-        else:
-            match_num = _get_match_num(dep, num)
-            command = f'echo \'{ans}\' | opt submit --match={match_num}'
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) 
         
     for ans_i in range(len(ans_list)):
         ans = ans_list[ans_i]
-        if len(proc_list) == len(ans_list):
-            proc = proc_list[ans_i]
         objective = OBJECTIVE_MAX
         constraint = None
         info = {}
@@ -177,6 +168,10 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             if is_debug:
                 response = _decode_response(_exec_submit_mock(dep))
             else:
+                match_num = _get_match_num(dep, num)
+                command = f'echo \'{ans}\' | opt submit --match={match_num}'
+                proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+                proc_list.append(proc)
                 response = _decode_response(proc.communicate()[0])
                 pass
             if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
@@ -190,8 +185,8 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             error_text = response[OUTPUT_FORMAT_ERROR_KEY]
             info = response[OUTPUT_FORMAT_INFO_KEY]
         except Exception as e:
-            logger.error('submit fail! (or solution broken)')
-            error_text = e
+            logger.error(e)
+            error_text = "submit error!"
             
         result[ans_i] = {
             ANS_KEY: {
@@ -206,6 +201,8 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
                 OUTPUT_FORMAT_INFO_KEY: info
             }
         }
+        print("************************")
+        print(result[ans_i])
     for proc in proc_list:
         proc.terminate()
 
@@ -239,9 +236,12 @@ def _decode_response(response_txt):
     Returns:
         dict: レスポンス内容の辞書型
     """
-    decoded_response = json.loads(response_txt)
-    logger.info(f'response: {decoded_response}')
-    return decoded_response
+    try:
+        decoded_response = json.loads(response_txt)
+        logger.info(f'response: {decoded_response}')
+        return decoded_response
+    except Exception as e:
+        raise e
 
 def _exec_submit_mock(dep):
     if dep == SOLVE_SINGLE_ID:
