@@ -170,21 +170,23 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
         ans = ans_list[ans_i]
         if len(proc_list) == len(ans_list):
             proc = proc_list[ans_i]
-        objective = sys.maxsize
+        objective = 1000 # Todo: 後で最適なものを考える
         constraint = None
         info = {}
         try:
             if is_debug:
-                response = _decode_response(_exec_submit_mock(dep, ans_list))
+                response = _decode_response(_exec_submit_mock(dep))
             else:
                 # Todo:
                 # response = proc.communicate()[0]
                 pass
-            decorded_response = _decode_response(response)
-            objective = decorded_response[OUTPUT_FORMAT_OBJECTIVE_KEY]
-            constraint = decorded_response[OUTPUT_FORMAT_CONSTRAINT_KEY]
-            error_text = decorded_response[OUTPUT_FORMAT_ERROR_KEY]
-            info = decorded_response[OUTPUT_FORMAT_INFO_KEY]
+            if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
+                objective = sum(response[OUTPUT_FORMAT_OBJECTIVE_KEY])
+            elif isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], float):
+                objective = response[OUTPUT_FORMAT_OBJECTIVE_KEY]
+            constraint = response[OUTPUT_FORMAT_CONSTRAINT_KEY]
+            error_text = response[OUTPUT_FORMAT_ERROR_KEY]
+            info = response[OUTPUT_FORMAT_INFO_KEY]
         except Exception as e:
             logger.error('submit fail! (or solution broken)')
             error_text = e
@@ -259,28 +261,28 @@ def _exec_submit_single_mock():
 """
 
 def _exec_submit_multi_mock():
-    if random.random < 0.5:
+    if random.random() < 0.5:
         return """
-            {
-                "objective": [-72000.0, 0.0, 0.0, 0.0],
-                "constraint": null,
-                "error": "エラー文",
-                "info": {
-                    "exe_time": 0.77885173400864,
-                }
-            }
-        """
+{
+    "objective": [-72000.0, 0.0, 0.0, 0.0],
+    "constraint": null,
+    "error": "エラー文",
+    "info": {
+        "exe_time": 0.77885173400864
+    }
+}
+"""
     else:
         return """
-            {
-                "objective": null,
-                "constraint": null,
-                "error": "エラー文",
-                "info": {
-                    "exe_time": 0.77885173400864,
-                }
-            }
-        """
+{
+    "objective": null,
+    "constraint": null,
+    "error": "エラー文",
+    "info": {
+        "exe_time": 0.77885173400864
+    }
+}
+"""
 
 def create_ans_list(dep, input_solution, timeout=TIMEOUT):
     """解のリストを生成

@@ -57,20 +57,20 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
             state = STATE_LOOP_HEAD
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_LOOP_HEAD:
-            # 解生成フェーズ
+            # 解選択フェーズ
             cluster.generate(individual_list)
             selected_individual_list = cluster.get_random_individual_list(
                 solve_num=INDIVISUAL_MAX
             )
             logger.info(f"[seleted individual List]")
             for individual in selected_individual_list:
-                logger.info(f'{hex(id(individual))}:{individual.get_schedule_list() }')
+                logger.info(f'{hex(id(individual))} -> [select] schedule:{individual.get_schedule_list()} weight:{individual.get_weight_list()}')
             state = STATE_INDIVIDUAL_SELECT
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_INDIVIDUAL_SELECT:
             # 解評価フェーズ
             evaluation_list = submiter.submit(dep, num, selected_individual_list, is_debug)
-            logger.info(f"submit result: {evaluation_list}")
+            for evaluation in evaluation_list: logger.info(f"submit result: {evaluation}")
             state = STATE_EVALUATION
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_EVALUATION:
@@ -86,16 +86,18 @@ def solve(dep, num, work_num, weight_num, loop_max, is_debug):
                     selected_weight[individual1_i] = 0
                     individual2_i = random.choices(individual_index_list, k = 1, weights = selected_weight)[0]
                     new_individual = evolution.crossover(
-                        Individual(evaluation_list[individual1_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY]),
-                        Individual(evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY])
+                        Individual(evaluation_list[individual1_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY],
+                            evaluation_list[individual1_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_WEIGHT_KEY]),
+                        Individual(evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY],
+                            evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_WEIGHT_KEY] )
                     )
                     individual_list.append(new_individual)
-                    logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
+                    logger.info(f"[交叉]{hex(id(new_individual))} -> [new] schedule:{new_individual.get_schedule_list()} weight:{new_individual.get_weight_list()}")
                 # 突然変異
                 else:
                     new_individual = evolution.mutate(work_num, weight_num)
                     individual_list.append(new_individual)
-                    logger.info(f"[変異]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
+                    logger.info(f"[変異]{hex(id(new_individual))} -> [new] schedule:{new_individual.get_schedule_list()} weight:{new_individual.get_weight_list()}")
             state = STATE_EVOLVE
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_EVOLVE:

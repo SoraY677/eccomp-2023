@@ -11,7 +11,7 @@ from constraints import WORK_MAX_DAY, WORK_MIN_DAY
 INDIVIDUAL_CONTENT_SCHEDULE_KEY = "schedule"
 INDIVIDUAL_CONTENT_SCHEDULE_START_KEY = "start"
 INDIVIDUAL_CONTENT_SCHEDULE_END_KEY = "end"
-INDIVIDUAL_CONTENT_WEIGHTS_KEY = "weights"
+INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY = "weights"
 INDIVIDUAL_PLOT_LIST_X_KEY = "x"
 INDIVIDUAL_PLOT_LIST_Y_KEY = "y"
 
@@ -35,20 +35,20 @@ class Individual:
         """
         self._content = {
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: [],
-            INDIVIDUAL_CONTENT_WEIGHTS_KEY: []
+            INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY: []
         }
         while True:
             if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]) == 0 and schedule_list is None and work_num > 0:
                 self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create_random_schedule_list(work_num)
-            if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]) == 0 and weight_list is None and weight_num > 0:
-                self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = self._create_random_weight_list(weight_num)
+            if len(self._content[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY]) == 0 and weight_list is None and weight_num > 0:
+                self._content[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY] = self._create_random_weight_list(weight_num)
             if self.is_allow_generate(ban_generation_list):
                 break
         
         if schedule_list is not None:
             self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = copy.copy(schedule_list)
         if weight_list is not None:
-            self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = copy.copy(weight_list)
+            self._content[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY] = copy.copy(weight_list)
 
     def _create_random_schedule_list(self, work_num):
         """スケジュールリスト生成
@@ -68,7 +68,7 @@ class Individual:
         
         return result
 
-    def _create_random_weight_list(self, weight_num, ban_generation_list):
+    def _create_random_weight_list(self, weight_num, ban_generation_list = []):
         """ランダムに重みを決定
 
         Args:
@@ -93,7 +93,7 @@ class Individual:
         Returns:
             float[]: SCIP重みの配列
         """
-        return self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
+        return self._content[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY]
 
     def get_plot_list(self):
         """プロット用のリストを作成
@@ -150,7 +150,7 @@ class Individual:
         """
         return {
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY],
-            INDIVIDUAL_CONTENT_WEIGHTS_KEY: self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
+            INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY: self._content[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY]
         }
 
     def deserialize(individual_json):
@@ -162,7 +162,7 @@ class Individual:
         Returns:
             Individual: 個体
         """
-        return Individual(schedule_list=individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY], weight_list=individual_json[INDIVIDUAL_CONTENT_WEIGHTS_KEY])
+        return Individual(schedule_list=individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY], weight_list=individual_json[INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY])
 
     def get_mating_content(self):
         """個体から交叉用の配列への変換用
@@ -177,8 +177,9 @@ class Individual:
         } for i in range(0, len(schedule_list), 2)]
         joint_index = len(schedule_list) / 2
         
-        if len(self.get_weight_list()) != 0:
-            mating_list.extend(self.get_weight_list())
+        weight_list = self.get_weight_list()
+        if len(weight_list) > 0:
+            mating_list.extend(weight_list)
         
         return mating_list, int(joint_index)
 
@@ -229,7 +230,7 @@ if __name__ == "__main__":
             self.assertTrue({
                 {
                     INDIVIDUAL_CONTENT_SCHEDULE_KEY: schedule_list,
-                    INDIVIDUAL_CONTENT_WEIGHTS_KEY: weight_list
+                    INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY: weight_list
                 } == individual.serialize()
             })
         def test_desirialize(self):
@@ -237,7 +238,7 @@ if __name__ == "__main__":
             weight_list = [0.6947156931851072, 0.5260175487956781, 0.7449466428168457, 0.29364899784938414]
             individual = Individual.deserialize(individual_json = {
                     INDIVIDUAL_CONTENT_SCHEDULE_KEY: schedule_list,
-                    INDIVIDUAL_CONTENT_WEIGHTS_KEY: weight_list
+                    INDIVIDUAL_CONTENT_WEIGHT_LIST_KEY: weight_list
             })
             self.assertTrue(individual.get_schedule_list() == schedule_list)
             self.assertTrue(individual.get_weight_list() == weight_list)
