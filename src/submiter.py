@@ -49,7 +49,7 @@ QUESTION_MAP = {
 }
 
 WEIGHT_NUM = 4
-TIMEOUT = 30000
+TIMEOUT = 28800
 OBJECTIVE_MAX = sys.maxsize
 
 INPUT_FORMAT_SCHEDULE_KEY = 'schedule'
@@ -163,17 +163,17 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
         ans = ans_list[ans_i]
         objective = OBJECTIVE_MAX
         constraint = None
+        error_text = ''
         info = {}
         try:
             if is_debug:
                 response = _decode_response(_exec_submit_mock(dep))
             else:
                 match_num = _get_match_num(dep, num)
-                command = f'echo \'{ans}\' | opt submit --match={match_num}'
+                command = f"echo {json.dumps(ans)} | opt submit --match={match_num}"
                 proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 proc_list.append(proc)
                 response = _decode_response(proc.communicate()[0])
-                pass
             if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
                 objective = -1 * response[OUTPUT_FORMAT_OBJECTIVE_KEY][0] + \
                     response[OUTPUT_FORMAT_OBJECTIVE_KEY][1] + \
@@ -182,7 +182,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             elif isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], float):
                 objective = response[OUTPUT_FORMAT_OBJECTIVE_KEY]
             constraint = response[OUTPUT_FORMAT_CONSTRAINT_KEY]
-            error_text = response[OUTPUT_FORMAT_ERROR_KEY]
+            error_text = response.get(OUTPUT_FORMAT_ERROR_KEY, '')
             info = response[OUTPUT_FORMAT_INFO_KEY]
         except Exception as e:
             logger.error(e)
