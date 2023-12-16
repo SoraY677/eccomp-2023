@@ -49,7 +49,7 @@ QUESTION_MAP = {
 }
 
 WEIGHT_NUM = 4
-TIMEOUT = 3000
+TIMEOUT = 30000
 OBJECTIVE_MAX = sys.maxsize
 
 INPUT_FORMAT_SCHEDULE_KEY = 'schedule'
@@ -180,7 +180,10 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
                 response = _decode_response(proc.communicate()[0])
                 pass
             if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
-                objective = sum(response[OUTPUT_FORMAT_OBJECTIVE_KEY])
+                objective = -1 * response[OUTPUT_FORMAT_OBJECTIVE_KEY][0] + \
+                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][1] + \
+                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][2] + \
+                    response[OUTPUT_FORMAT_OBJECTIVE_KEY][3]
             elif isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], float):
                 objective = response[OUTPUT_FORMAT_OBJECTIVE_KEY]
             constraint = response[OUTPUT_FORMAT_CONSTRAINT_KEY]
