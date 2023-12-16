@@ -152,7 +152,11 @@ def _exec_submit_command(dep, num, ans_list):
     result = []
     for ans in ans_list:
         result.append({
-            ANS_KEY: ans,
+            ANS_KEY: {
+                INPUT_FORMAT_SCHEDULE_KEY: ans.get(INPUT_FORMAT_SCHEDULE_KEY, []),
+                INPUT_FORMAT_WEIGHT_KEY: ans.get(INPUT_FORMAT_WEIGHT_KEY, []),
+                INPUT_FORMAT_TIMEOUT_KEY: ans.get(INPUT_FORMAT_TIMEOUT_KEY, -1)
+            },
             EVAL_KEY: {
                 OUTPUT_FORMAT_OBJECTIVE_KEY: 1550.5,
                 OUTPUT_FORMAT_CONSTRAINT_KEY: None,
@@ -197,6 +201,7 @@ def submit(dep, num, ans_list):
         ans_list (any): 解のリスト
     """
     return _exec_submit_command(dep, num, ans_list)
+
 # 
 # 単体テスト
 #

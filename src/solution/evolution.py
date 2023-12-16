@@ -11,37 +11,40 @@ sys.path.append(path.dirname(__file__))
 from individual import Individual
 from constraints import CROSSOVER_POINT_MAX
 
-def crossover(schedule1, schedule2, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
+def crossover(parent_individual, child_individual, ban_generation_list = [], crossover_point_max = CROSSOVER_POINT_MAX):
     """交叉
 
     Args:
-        individual1 (Individual): 個体1
-        individual2 (Individual): 個体2
+        parent_individual (Individual): 個体1
+        child_individual (Individual): 個体2
         ban_generation_list (list, optional): 生成禁止リスト. Defaults to [].
         crossover_point_max (int, optional): 交叉点最大数. Defaults to CROSSOVER_POINT_MAX.
 
     Returns:
-        _type_: _description_
+        Individual: 新個体
     """
-    parent_num = random.randint(1,2)
-    parent_schedule = schedule1 if parent_num == 1 else schedule2
-    child_schedule = schedule2 if parent_num == 1 else schedule1
+    parent_list, joint_index = parent_individual.get_mating_content()
+    child_list, _ = child_individual.get_mating_content()
 
-    result = []
-    crossover_point = set([random.randint(0, len(parent_schedule) - 1) for _ in range(crossover_point_max)])
-    is_parent = True
-    for i in range(len(parent_schedule)):
-        if is_parent:
-            result.append(parent_schedule[i])
-        else:
-            result.append(child_schedule[i])
-        
-        if i+1 in crossover_point:
-            is_parent = not is_parent
+    while True: # まだ生成されていない個体が生まれるまで無限生成
+        result = []
+        crossover_point = set([random.randint(0, len(parent_list) - 1) for _ in range(crossover_point_max)])
+        is_parent = [True, False][random.randint(0,1)]
+        for i in range(len(parent_list)):
+            if is_parent:
+                result.append(parent_list[i])
+            else:
+                result.append(child_list[i])
+            if i+1 in crossover_point:
+                is_parent = not is_parent
 
-    return Individual(schedule_list=result, ban_generation_list=ban_generation_list)
+        individual = Individual.format_mating_content(result, joint_index)
+        if individual.is_allow_generate(ban_generation_list):
+            break
 
-def mutate(work_num):
+    return individual
+
+def mutate(work_num=None, weight_num=None):
     """突然変異
 
     Args:
@@ -50,7 +53,8 @@ def mutate(work_num):
     Returns:
         Individual: 個体
     """
-    return Individual(work_num=work_num)
+    return Individual(work_num=work_num, weight_num=weight_num)
+
 #
 # 単体テスト
 #

@@ -9,6 +9,8 @@ sys.path.append(path.dirname(__file__))
 from constraints import WORK_MAX_DAY, WORK_MIN_DAY
 
 INDIVIDUAL_CONTENT_SCHEDULE_KEY = "schedule"
+INDIVIDUAL_CONTENT_SCHEDULE_START_KEY = "start"
+INDIVIDUAL_CONTENT_SCHEDULE_END_KEY = "end"
 INDIVIDUAL_CONTENT_WEIGHTS_KEY = "weights"
 INDIVIDUAL_PLOT_LIST_X_KEY = "x"
 INDIVIDUAL_PLOT_LIST_Y_KEY = "y"
@@ -35,39 +37,37 @@ class Individual:
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: [],
             INDIVIDUAL_CONTENT_WEIGHTS_KEY: []
         }
+        while True:
+            if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]) == 0 and schedule_list is None and work_num is not None:
+                self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create_random_schedule_list(work_num)
+            if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]) == 0 and weight_list is None and weight_num is not None:
+                self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = self._create_random_weight_list(weight_num)
+            if self.is_allow_generate(ban_generation_list):
+                break
         
         if schedule_list is not None:
             self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = copy.copy(schedule_list)
-        if len(self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]) == 0 and work_num is not None:
-            self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY] = self._create_random_schedule_list(work_num, ban_generation_list)
-            
         if weight_list is not None:
             self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = copy.copy(weight_list)
-        if len(self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]) == 0 and weight_num is not None:
-            self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY] = self._create_random_weight_list(weight_num, ban_generation_list)
-    
-    def _create_random_schedule_list(self, work_num, ban_generation_list = []):
+
+    def _create_random_schedule_list(self, work_num):
         """スケジュールリスト生成
 
         Args:
             work_num (int): ワーク数
-            ban_generation_list (list): 作成禁止リスト（過去に作成済み）
 
         Returns:
             list: 開始時間・終了時間の配列
         """
-        while(True):
-            result = []
-            for _ in range(work_num):
-                start = random.randint(WORK_MIN_DAY, WORK_MAX_DAY)
-                end = random.randint(start, WORK_MAX_DAY)
-                result.append(start)
-                result.append(end)
-            if result not in ban_generation_list:
-                break
+        result = []
+        for _ in range(work_num):
+            start = random.randint(WORK_MIN_DAY, WORK_MAX_DAY)
+            end = random.randint(start, WORK_MAX_DAY)
+            result.append(start)
+            result.append(end)
         
         return result
-    
+
     def _create_random_weight_list(self, weight_num, ban_generation_list):
         """ランダムに重みを決定
 
@@ -86,7 +86,7 @@ class Individual:
             int[]: スケジュールの配列
         """
         return self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY]
-    
+
     def get_weight_list(self):
         """SCIP重みリストを取得
 
@@ -94,7 +94,7 @@ class Individual:
             float[]: SCIP重みの配列
         """
         return self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
-    
+
     def get_plot_list(self):
         """プロット用のリストを作成
 
@@ -127,7 +127,7 @@ class Individual:
             return None
 
         return result
-    
+
     def get_plot_max(work_num=-1, weight_num=-1):
         """プロット配列の数を取得
 
@@ -141,7 +141,7 @@ class Individual:
         work_max = work_num if work_num != -1 else 0
         weight_max = (weight_num-1)*(weight_num)/2 if weight_num != -1 else 0
         return int(work_max + weight_max)
-    
+
     def serialize(self):
         """シリアライズ
 
@@ -152,7 +152,7 @@ class Individual:
             INDIVIDUAL_CONTENT_SCHEDULE_KEY: self._content[INDIVIDUAL_CONTENT_SCHEDULE_KEY],
             INDIVIDUAL_CONTENT_WEIGHTS_KEY: self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
         }
-        
+
     def deserialize(individual_json):
         """デシリアライズ
 
@@ -163,7 +163,47 @@ class Individual:
             Individual: 個体
         """
         return Individual(schedule_list=individual_json[INDIVIDUAL_CONTENT_SCHEDULE_KEY], weight_list=individual_json[INDIVIDUAL_CONTENT_WEIGHTS_KEY])
-    
+
+    def get_mating_content(self):
+        """個体から交叉用の配列への変換用
+
+        Returns:
+            list, int: 交叉用の配列, 結合部分(結合なしなら-1)
+        """
+        schedule_list = self.get_schedule_list()
+        mating_list = [{
+            INDIVIDUAL_CONTENT_SCHEDULE_START_KEY: schedule_list[i],
+            INDIVIDUAL_CONTENT_SCHEDULE_END_KEY: schedule_list[i+1] 
+        } for i in range(0, len(schedule_list), 2)]
+        joint_index = len(schedule_list) / 2
+        
+        if len(self.get_weight_list()) != 0:
+            mating_list.extend(self.get_weight_list())
+        
+        return mating_list, int(joint_index)
+
+    def format_mating_content(mating_list, joint_index):
+        """交叉用配列から個体への変換
+
+        Args:
+            mating_list (list): 交叉用配列
+            joint_index (int): 結合部
+
+        Returns:
+            Individual: 新規個体
+        """
+        schedule_dict_list = mating_list[:joint_index]
+        schedule_list = []
+        for schedule_dict in schedule_dict_list:
+            schedule_list.append(schedule_dict[INDIVIDUAL_CONTENT_SCHEDULE_START_KEY])
+            schedule_list.append(schedule_dict[INDIVIDUAL_CONTENT_SCHEDULE_END_KEY])
+        weight_list = mating_list[joint_index:]
+        
+        return Individual(schedule_list, weight_list)
+        
+    def is_allow_generate(self, ban_generation_list):
+        # Todo:後で実装
+        return True
 #
 # 単体テスト
 #

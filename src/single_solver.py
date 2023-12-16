@@ -90,8 +90,8 @@ def solve(dep, num, work_num, loop_max):
                     selected_weight[individual1_i] = 0
                     individual2_i = random.choices(individual_index_list, k = 1, weights = selected_weight)[0]
                     new_individual = evolution.crossover(
-                        evaluation_list[individual1_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY],
-                        evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY]
+                        Individual(evaluation_list[individual1_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY]),
+                        Individual(evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY])
                     )
                     individual_list.append(new_individual)
                     logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
@@ -99,7 +99,7 @@ def solve(dep, num, work_num, loop_max):
                 else:
                     new_individual = evolution.mutate(work_num)
                     individual_list.append(new_individual)
-                    logger.info(f"[変異]{hex(id(new_individual))} -> new:: {new_individual.get_schedule_list()}")
+                    logger.info(f"[変異]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
             state = STATE_EVOLVE
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_EVOLVE:
