@@ -4,18 +4,12 @@
 import datetime
 import logging
 from os import path
-if __name__ == "__main__":
-    import submiter
-    import single_solver
-    import multi_solver
-    from util import path_util
-else:
-    from src import submiter
-    from src import single_solver
-    from src import multi_solver
-    from src.util import path_util
-    from src.util import logger
 import sys
+sys.path.append(path.dirname(__file__))
+import submiter
+import single_solver
+import multi_solver
+from util import path_util
 
 def init(dep, num, rootpath):
     """初期化

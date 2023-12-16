@@ -5,19 +5,14 @@ import os
 import os.path as path
 import datetime
 import glob
+from os import path
 import sys
-if __name__ == "__main__":
-    from util import json_operator
-    from util import path_util
-    from util import logger
-    from solution.cluster import Cluster
-    from solution.individual import Individual
-else:
-    from src.util import json_operator
-    from src.util import path_util
-    from src.util import logger
-    from src.solution.cluster import Cluster
-    from src.solution.individual import Individual
+sys.path.append(path.dirname(__file__))
+from util import json_operator
+from util import path_util
+from util import logger
+from solution.cluster import Cluster
+from solution.individual import Individual
 
 STATE_KEY = 'state'
 COUNT_KEY = "count"
@@ -59,7 +54,6 @@ def _deserialize(content):
         STATE_KEY: content[STATE_KEY],
         COUNT_KEY: content[COUNT_KEY],
         CLUSTER_KEY: Cluster.deserialize(content[CLUSTER_KEY]),
-        WEIGHT_CLUSTER_KEY: 
         INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[INDIVIDUAL_LIST_KEY]],
         SELECTED_INDIVIDUAL_LIST_KEY: [Individual.deserialize(individual_json) for individual_json in content[SELECTED_INDIVIDUAL_LIST_KEY]],
         EVALUATION_LIST: content[EVALUATION_LIST]

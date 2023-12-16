@@ -4,10 +4,10 @@
 import sys
 import subprocess
 import json
-if __name__ == "__main__":
-    from util import logger
-else:
-    from src.util import logger
+from os import path
+import sys
+sys.path.append(path.dirname(__file__))
+from util import logger
 
 SOLVE_SINGLE_ID = 's' # 単目的
 SOLVE_MULTI_ID  = 'm' # 多目的
