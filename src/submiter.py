@@ -186,7 +186,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             info = response[OUTPUT_FORMAT_INFO_KEY]
         except Exception as e:
             logger.error(e)
-            error_text = "submit error!"
+            error_text = f"{e}"
             
         result[ans_i] = {
             ANS_KEY: {
@@ -201,8 +201,6 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
                 OUTPUT_FORMAT_INFO_KEY: info
             }
         }
-        print("************************")
-        print(result[ans_i])
     for proc in proc_list:
         proc.terminate()
 

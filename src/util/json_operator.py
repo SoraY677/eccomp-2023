@@ -30,9 +30,10 @@ def write(filepath, content):
     Returns:
         Exception|None: 書き込みの成否(成:None|否:Exception)
     """
+    json_content = json.dumps(content)
     try:
         with open(filepath, 'w') as f:
-            json.dump(content, f, indent=2)
+            f.write(json_content)
         return None
     except Exception as e:
         return e
