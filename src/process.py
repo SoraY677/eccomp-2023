@@ -9,19 +9,26 @@ sys.path.append(path.dirname(__file__))
 import submiter
 import single_solver
 import multi_solver
+import store
 from util import path_util
 from util import logger
 
-def init(dep, num, rootpath):
+def init(dep, num, rootpath, is_debug, is_store):
     """初期化
 
     Args:
         dep (string): 問題部門
         num (int): 問題番号
         rootpath (string): プロジェクトのルートパス
+        is_debug (bool): デバッグモードか
+        is_store (bool): データ保持するか
     """
     path_util.init(rootpath)
-    logger.init(path.join(path_util.PATH_MAP["data/app-log"], dep+str(num)), logging.INFO)
+    if is_debug:
+        logger.init()
+    else:
+        logger.init(path.join(path_util.PATH_MAP["data/app-log"], dep+str(num)), logging.INFO)
+    store.init(is_store)
     
     logger.info(f"[program start] {datetime.datetime.now()}")
     

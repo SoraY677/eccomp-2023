@@ -2,22 +2,16 @@
 # 単目的用ソルバ
 #
 import random
-if __name__ == "__main__":
-    import submiter
-    import store
-    from util import logger
-    from solution import evolution
-    from solution.individual import Individual
-    from solution.cluster import Cluster
-    from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
-else:
-    from src import submiter
-    from src import store
-    from src.util import logger
-    from src.solution import evolution
-    from src.solution.individual import Individual
-    from src.solution.cluster import Cluster
-    from src.solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
+from os import path
+import sys
+sys.path.append(path.dirname(__file__))
+import submiter
+import store
+from util import logger
+from solution import evolution
+from solution.individual import Individual
+from solution.cluster import Cluster
+from solution.constraints import CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT, INDIVISUAL_MAX, MUTATE_RATE, INITIALIZE_INDIVIDUAL_MAX_DEFAULT
 
 STATE_LOOP_HEAD = 0
 STATE_INDIVIDUAL_SELECT = 1
@@ -39,7 +33,10 @@ def solve(dep, num, work_num, loop_max):
     if loaded_data is None: # データがない場合
         state = STATE_LOOP_TAIL
         count = 1
-        cluster = Cluster(CLUSTER_MAX_DEFAULT, CLUSTER_LOOP_MAX_DEFAULT)
+        cluster = Cluster(
+            plot_max=Individual.get_plot_max(work_num),
+            cluster_max=CLUSTER_MAX_DEFAULT,
+            cluster_loop_max=1)
         individual_list = [Individual(work_num=work_num) for _ in range(INITIALIZE_INDIVIDUAL_MAX_DEFAULT)]
         selected_individual_list = []
         evaluation_list = []
@@ -60,12 +57,12 @@ def solve(dep, num, work_num, loop_max):
         if state == STATE_LOOP_HEAD:
             # 解生成フェーズ
             cluster.generate(individual_list)
-            selected_individual_list = cluster.get_separated_individual_list(
+            selected_individual_list = cluster.get_random_individual_list(
                 solve_num=INDIVISUAL_MAX
             )
             logger.info(f"[seleted individual List]")
             for individual in selected_individual_list:
-                logger.info(f'{hex(id(individual))}:{individual.get_schedule() }')
+                logger.info(f'{hex(id(individual))}:{individual.get_schedule_list() }')
             state = STATE_INDIVIDUAL_SELECT
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_INDIVIDUAL_SELECT:
@@ -73,7 +70,7 @@ def solve(dep, num, work_num, loop_max):
             schedule_list = []
             for individual in selected_individual_list:
                 schedule_list.append({
-                    submiter.INPUT_FORMAT_SCHEDULE_KEY: individual.get_schedule()
+                    submiter.INPUT_FORMAT_SCHEDULE_KEY: individual.get_schedule_list()
                 })
             ans_list = submiter.create_ans_list(dep, schedule_list)
             evaluation_list = submiter.submit(dep, num, ans_list)
@@ -97,12 +94,12 @@ def solve(dep, num, work_num, loop_max):
                         evaluation_list[individual2_i][submiter.ANS_KEY][submiter.INPUT_FORMAT_SCHEDULE_KEY]
                     )
                     individual_list.append(new_individual)
-                    logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule()}")
+                    logger.info(f"[交叉]{hex(id(new_individual))} -> new: {new_individual.get_schedule_list()}")
                 # 突然変異
                 else:
                     new_individual = evolution.mutate(work_num)
                     individual_list.append(new_individual)
-                    logger.info(f"[変異]{hex(id(new_individual))} -> new:: {new_individual.get_schedule()}")
+                    logger.info(f"[変異]{hex(id(new_individual))} -> new:: {new_individual.get_schedule_list()}")
             state = STATE_EVOLVE
             store.save(dep, num, state, count, cluster, individual_list, selected_individual_list, evaluation_list)
         if state == STATE_EVOLVE:

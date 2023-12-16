@@ -22,6 +22,17 @@ SELECTED_INDIVIDUAL_LIST_KEY = "selected_individual_list"
 INDIVIDUAL_LIST_KEY = "individual_list"
 EVALUATION_LIST = "evaluation_list"
 
+_is_store = False
+
+def init(is_store):
+    """初期化
+
+    Args:
+        is_store (bool): データ保持するか
+    """
+    global _is_store
+    _is_store = is_store
+
 def load(dep, num):
     """読み込み
 
@@ -32,6 +43,8 @@ def load(dep, num):
     Returns:
         dict|None: ファイル内容|なければNone
     """
+    if _is_store is False: return None
+    
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     file_list = sorted(glob.glob(dirpath + '\*'), reverse=True)
     if len(file_list) == 0:
@@ -74,6 +87,8 @@ def save(dep, num, state, count, cluster, individual_list, selected_individual_l
     Returns:
         str: ファイルパス
     """
+    if _is_store is False: return None
+    
     dirpath = path.join(path_util.PATH_MAP["data/result"], f"{dep}{num}")
     if path.isdir(dirpath) is False:
         os.mkdir(dirpath)
