@@ -1,12 +1,12 @@
 #
 # 個体
 #
+from os import path
+import sys
 import random
 import copy
-if __name__ == "__main__":
-    from constraints import WORK_MAX_DAY, WORK_MIN_DAY
-else:
-    from src.solution.constraints import WORK_MAX_DAY, WORK_MIN_DAY
+sys.path.append(path.dirname(__file__))
+from constraints import WORK_MAX_DAY, WORK_MIN_DAY
 
 INDIVIDUAL_CONTENT_SCHEDULE_KEY = "schedule"
 INDIVIDUAL_CONTENT_WEIGHTS_KEY = "weights"
