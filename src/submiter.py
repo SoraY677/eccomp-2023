@@ -163,8 +163,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
         else:
             match_num = _get_match_num(dep, num)
             command = f'echo \'{ans}\' | opt submit --match={match_num}'
-            # Todo:
-            # proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) 
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) 
         
     for ans_i in range(len(ans_list)):
         ans = ans_list[ans_i]
@@ -177,8 +176,7 @@ def _exec_submit_command(dep, num, individual_list, is_debug):
             if is_debug:
                 response = _decode_response(_exec_submit_mock(dep))
             else:
-                # Todo:
-                # response = proc.communicate()[0]
+                response = _decode_response(proc.communicate()[0])
                 pass
             if isinstance(response[OUTPUT_FORMAT_OBJECTIVE_KEY], list):
                 objective = sum(response[OUTPUT_FORMAT_OBJECTIVE_KEY])
