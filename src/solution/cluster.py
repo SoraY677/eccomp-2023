@@ -83,7 +83,7 @@ class Cluster:
             # 再クラスタリング
             for clus_i1, cluster1 in enumerate(cluster_list):
                 for clus_i2, cluster2 in enumerate(cluster_list):
-                    if clus_i1 == clus_i2: continue
+                    if clus_i1 >= clus_i2: continue
                     for ind_i1, individual1 in enumerate(cluster1[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]):
                         for ind_i2, individual2 in enumerate(cluster2[CLUSTER_LIST_INDIVIDUAL_LIST_KEY]):
                             if self._is_individual_swap(cluster1, individual1, individual2):
@@ -226,6 +226,7 @@ class Cluster:
             cluster_loop_max=cluster_data[CLUSTER_LOOP_KEY],
             cluster_list=cluster_list
         )
+
 #
 # 単体テスト
 #
