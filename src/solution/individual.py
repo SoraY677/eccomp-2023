@@ -267,6 +267,15 @@ if __name__ == "__main__":
             individual = Individual(schedule_list=schedule_list, weight_list=weight_list)
             plot_list = individual.get_plot_list()
             self.assertTrue(len(plot_list) == 16)
-        # Todo: 禁止リストに関するテスト
-            
+        def test_ban_or_allow(self):
+            ban_schedule_list = [7, 7, 6, 8, 3, 7, 9, 9, 6, 9, 2, 2, 1, 8, 1, 2, 1, 7, 7, 8]
+            ban_weight_list = [0.6947156931851072, 0.5260175487956781, 0.7449466428168457, 0.29364899784938414]
+            ban_id = [Individual.create_individual_id(ban_schedule_list, ban_weight_list)]
+
+            ban_individual = Individual(ban_schedule_list, ban_weight_list)
+            self.assertTrue(ban_individual.is_allow_generate(ban_id) is False)
+
+            allow_individual = Individual([7, 7, 6, 1, 3, 7, 9, 9, 6, 9, 2, 2, 1, 8, 1, 2, 1, 7, 7, 8], [0.6947156931851072, 0.5260175487956781, 0.7449466428168457, 0.29364899784938414])
+            self.assertTrue(allow_individual.is_allow_generate(ban_id) is True)
+
     unittest.main()
