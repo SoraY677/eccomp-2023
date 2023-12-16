@@ -96,6 +96,11 @@ class Individual:
         return self._content[INDIVIDUAL_CONTENT_WEIGHTS_KEY]
     
     def get_plot_list(self):
+        """プロット用のリストを作成
+
+        Returns:
+            list: プロット用リスト
+        """
         result = []
         # スケジュール
         # x -> 工数 = endtime - starttime
